@@ -83,6 +83,34 @@ button:hover{filter:brightness(1.08)}
 .msg button{margin-top:12px}
 .sum{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 16px;margin-top:10px}
 .sum span{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+
+.msg.warn{background:var(--warn-bg);border-color:var(--warn)}
+.rb{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.mode{display:flex;gap:0;align-items:center;flex-wrap:wrap;margin-top:10px}
+.mode > span{font-size:13px;color:var(--muted);margin-right:10px}
+.mode button{border-radius:0;background:transparent;color:var(--navy);min-height:40px;padding:8px 14px}
+.mode button:first-of-type{border-radius:8px 0 0 8px}.mode button:last-of-type{border-radius:0 8px 8px 0;border-left:0}
+.mode button[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink);font-weight:700}
+.docs{margin:0 0 16px;padding:14px;border:1px dashed var(--navy);border-radius:10px;background:var(--soft)}
+body[data-mode="manual"] .docs{display:none}
+.docs-h{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+.docs-h strong{color:var(--navy)}.docs-h span{font-size:13.5px;color:var(--muted)}
+.drop{display:block;text-align:center;padding:18px 12px;border:1px dashed var(--line);border-radius:8px;background:var(--surface);cursor:pointer;font-weight:500;font-size:14.5px}
+.drop.over{border-color:var(--navy);background:var(--bad-bg)}
+.dlist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.dlist li{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;word-break:break-word}
+.dlist .st{color:var(--muted)}.dlist .st.ok{color:var(--ok);font-weight:600}.dlist .st.bad{color:var(--bad)}
+.dlist .det{color:var(--muted);font-size:13px}.dlist .warnt{color:var(--warn)}
+.docs-f{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:10px}
+.docs-f small{flex:1 1 240px}
+input.auto,select.auto,textarea.auto{border-left:4px solid var(--navy);background:var(--soft)}
+.srow{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.srow small{display:block}
+.sbtn{display:flex;gap:6px;flex-wrap:wrap}.sbtn button{min-height:36px;padding:6px 12px}
+.muted{color:var(--muted);margin:10px 0 0}
+.filebtn{display:inline-block;margin-top:12px;border:1px solid var(--navy);color:var(--navy);border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:500}
+.bar .btns{display:flex;gap:8px;flex-wrap:wrap}
+.bar .btns button{padding:9px 12px}
 [hidden]{display:none !important}
 @media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
 </style>
@@ -92,8 +120,16 @@ button:hover{filter:brightness(1.08)}
   <header class="top">
     <span class="brand">Adm House · Intermediação de imóveis</span>
     <h1>Proposta de compra de imóvel</h1>
-    <p>Preencha os campos e gere o PDF. O documento sai pronto para assinatura do comprador e do vendedor (proprietário), com o aceite do vendedor no final. Campos com * são obrigatórios.</p>
+    <p>Preencha os campos ou envie os documentos para o formulário ler e preencher por você. Depois gere o PDF. O documento sai pronto para assinatura do comprador e do vendedor (proprietário), com o aceite do vendedor no final. Campos com * são obrigatórios.</p>
+    <div class="mode" role="group" aria-label="Modo de preenchimento"><span>Preenchimento:</span><button type="button" id="mode_auto" aria-pressed="true">Automático (enviar documentos)</button><button type="button" id="mode_manual" aria-pressed="false">Manual</button></div>
   </header>
+
+  <div id="restore_bar" class="msg warn" hidden></div>
+  <details class="cfg" id="saved_box">
+    <summary>Propostas salvas (<span id="saved_n">0</span>)</summary>
+    <div id="saved_list"></div>
+    <label class="filebtn" for="imp">Abrir arquivo .json</label><input type="file" id="imp" accept=".json,application/json" hidden>
+  </details>
 
   <div id="msg" class="msg" hidden role="status" aria-live="polite"></div>
 
@@ -110,9 +146,11 @@ button:hover{filter:brightness(1.08)}
   <section class="card">
     <h2>Proponente comprador</h2>
     <p class="lead">Dados de quem faz a proposta e assina como comprador.</p>
+    <div id="dz_p"></div>
     <div class="grid" id="f_p"></div>
     <div class="check"><input type="checkbox" id="t_conj"><label for="t_conj">Há cônjuge, companheiro(a) ou segundo comprador</label></div>
     <div id="box_conj" class="sub" hidden>
+      <div id="dz_c"></div>
       <div class="grid" id="f_c"></div>
     </div>
   </section>
@@ -120,6 +158,7 @@ button:hover{filter:brightness(1.08)}
   <section class="card">
     <h2>Vendedor (proprietário do imóvel)</h2>
     <p class="lead">O vendedor assina o aceite desta proposta. Se for casado ou viver em união estável, o cônjuge também assina, em anuência.</p>
+    <div id="dz_v"></div>
     <div class="grid" id="f_v"></div>
     <div class="check"><input type="checkbox" id="t_vconj"><label for="t_vconj">O vendedor tem cônjuge ou companheiro(a) que deve assinar</label></div>
     <div id="box_vconj" class="sub" hidden>
@@ -129,6 +168,7 @@ button:hover{filter:brightness(1.08)}
 
   <section class="card">
     <h2>Imóvel</h2>
+    <div id="dz_im"></div>
     <div class="grid" id="f_im"></div>
     <div class="check"><input type="checkbox" id="t_visitou"><label for="t_visitou">O proponente já visitou e conferiu o imóvel</label></div>
   </section>
@@ -169,10 +209,12 @@ button:hover{filter:brightness(1.08)}
 
 <div class="bar">
   <div class="in">
-    <span class="hint">O PDF é montado no seu navegador. Nenhum dado é enviado para fora desta página.</span>
-    <div style="display:flex;gap:10px">
-      <button type="button" class="ghost" id="btn_clear">Limpar formulário</button>
-      <button type="button" class="primary" id="btn_gen">Gerar PDF para assinatura</button>
+    <span class="hint" id="save_hint">O PDF é montado no seu navegador. Nenhum dado é enviado para fora desta página.</span>
+    <div class="btns">
+      <button type="button" class="ghost" id="btn_clear">Limpar</button>
+      <button type="button" class="ghost" id="btn_draft">Salvar rascunho</button>
+      <button type="button" class="ghost" id="btn_save">Salvar proposta</button>
+      <button type="button" class="primary" id="btn_gen">Gerar PDF</button>
     </div>
   </div>
 </div>
@@ -711,6 +753,250 @@ function buildPdf(d, J){
 
 </script>
 <script>
+/* ===== EXTRAÇÃO: transforma o texto lido de documentos em campos do formulário (sem DOM) ===== */
+function exNorm(s){
+  return String(s || '').split('').map(function(ch){ return ch.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }).join('').toUpperCase();
+}
+function exPrep(text){
+  var lines = String(text || '').split(/\r?\n/).map(function(s){ return s.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
+  return {lines: lines, nl: lines.map(exNorm), all: exNorm(text)};
+}
+function exTitle(s){
+  var small = {DE:1, DA:1, DO:1, DAS:1, DOS:1, E:1};
+  return String(s || '').toLowerCase().split(/\s+/).map(function(w, i){
+    return (i > 0 && small[w.toUpperCase()]) ? w : w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(' ');
+}
+function exCleanName(s){ return String(s || '').replace(/[^A-Za-zÀ-ÿ' ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function exCutName(s){ return String(s||'').split(/[,;:]|\bCPF\b|\bRG\b|\bCNPJ\b|\bINSCRIT/i)[0]; }
+function exPlausibleName(s){
+  var c = exCleanName(s), w = c.split(' ').filter(function(x){ return x.length > 1; });
+  return c.length >= 8 && c.length <= 70 && w.length >= 2;
+}
+function exParseDate(s){
+  var m = /(\d{2})\s*[\/\.\-\s]\s*(\d{2})\s*[\/\.\-\s]\s*(\d{4})/.exec(String(s || ''));
+  if (!m) return null;
+  var d = +m[1], mo = +m[2], y = +m[3];
+  if (d < 1 || d > 31 || mo < 1 || mo > 12 || y < 1900 || y > 2100) return null;
+  return m[3] + '-' + m[2] + '-' + m[1];
+}
+function exIsLabel(n){
+  return /^(NOME|FILIACAO|NATURALIDADE|DATA|DOC|CPF|REGISTRO|VALIDADE|ASSINATURA|CATEGORIA|OBSERVACOES|LOCAL|ORGAO|PAI|MAE|NACIONALIDADE|ENDERECO|BAIRRO|CEP|CIDADE)\b/.test(n) || /:\s*$/.test(n);
+}
+/* valor depois de um rótulo: na mesma linha ou nas 2 seguintes */
+function exFindValue(P, labelRe, exclRe, validator){
+  for (var i = 0; i < P.lines.length; i++) {
+    var m = labelRe.exec(P.nl[i]);
+    if (!m) continue;
+    if (exclRe && exclRe.test(P.nl[i])) continue;
+    var rest = P.lines[i].slice(m.index + m[0].length).replace(/^[\s:\-\.\/]+/, '');
+    if (rest && validator(rest)) return rest;
+    for (var j = i + 1; j <= i + 2 && j < P.lines.length; j++) {
+      if (exIsLabel(P.nl[j]) && !validator(P.lines[j])) continue;
+      if (validator(P.lines[j])) return P.lines[j];
+    }
+  }
+  return null;
+}
+function exFirstValidCPF(text){
+  var re = /(?<!\d)(\d{3}\.?\d{3}\.?\d{3}-?\d{2})(?!\d)/g, m;
+  while ((m = re.exec(String(text || '')))) { if (validCPF(m[1])) return onlyDigits(m[1]); }
+  return null;
+}
+function exEarliestDate(text){
+  var re = /(\d{2})[\/\.\-](\d{2})[\/\.\-](\d{4})/g, m, best = null, now = new Date().getFullYear();
+  while ((m = re.exec(String(text || '')))) {
+    var iso = exParseDate(m[0]);
+    if (!iso) continue;
+    var y = +m[3];
+    if (y > now - 14) continue;
+    if (!best || iso < best) best = iso;
+  }
+  return best;
+}
+function exCityUf(s){
+  var m = /^(.*?)[\s\-\/,]+([A-Za-z]{2})\s*$/.exec(String(s || '').replace(/[^A-Za-zÀ-ÿ\s\-\/,]/g, ' ').replace(/\s+/g, ' ').trim());
+  if (m && m[1].length > 2) return exTitle(m[1].trim()) + '/' + m[2].toUpperCase();
+  return null;
+}
+
+/* ---- classificação do documento ---- */
+function exClassify(text){
+  var t = exNorm(text), tipos = [];
+  if (/REGISTRO GERAL|CARTEIRA DE IDENTIDADE|SECRETARIA DE SEGURANCA|INSTITUTO DE IDENTIFICACAO|CARTEIRA DE IDENTIDADE NACIONAL/.test(t)) tipos.push('rg');
+  if (/CARTEIRA NACIONAL DE HABILITACAO|PERMISSAO PARA DIRIGIR|\bCNH\b/.test(t)) tipos.push('cnh');
+  if (/CERTIDAO DE CASAMENTO/.test(t)) tipos.push('casamento');
+  if (/CERTIDAO DE NASCIMENTO/.test(t)) tipos.push('nascimento');
+  if (/MATRICULA|REGISTRO DE IMOVEIS|ESCRITURA PUBLICA|INTEIRO TEOR|OFICIAL DE REGISTRO/.test(t) && /IMOVEL|IMOVEIS|ESCRITURA|REGISTRO/.test(t)) tipos.push('matricula');
+  if (/\bIPTU\b|IMPOSTO PREDIAL|INSCRICAO (IMOBILIARIA|CADASTRAL)/.test(t)) tipos.push('iptu');
+  if (/ENERGIA ELETRICA|UNIDADE CONSUMIDORA|AGUA E ESGOTO|SANEAMENTO|FATURA|CONTA DE (LUZ|AGUA)|CONSUMO|VENCIMENTO/.test(t)) tipos.push('conta');
+  return tipos;
+}
+var EX_NOMES = {rg:'RG', cnh:'CNH', casamento:'Certidão de casamento', nascimento:'Certidão de nascimento', matricula:'Escritura / matrícula', iptu:'IPTU', conta:'Comprovante de endereço (conta)', outro:'Documento não identificado'};
+
+/* ---- documento pessoal (RG, CNH) e certidões ---- */
+function exParsePessoal(text){
+  var P = exPrep(text), out = {};
+  var cpf = exFirstValidCPF(text);
+  if (cpf) out.cpf = fmtCPF(cpf);
+
+  var nome = exFindValue(P, /\bNOME( E SOBRENOME)?\b/, /\b(PAI|MAE|SOCIAL|FILIACAO|CONJUGE|EMPRESA|ASSINATURA|PAIS)\b/, exPlausibleName);
+  if (nome) out.nome = exCleanName(exCutName(nome)).toUpperCase();
+
+  var nasc = exFindValue(P, /NASC(IMENTO)?\b/, null, function(s){ return !!exParseDate(s); });
+  var nascIso = nasc ? exParseDate(nasc) : exEarliestDate(text);
+  if (nascIso) out.nasc = nascIso;
+
+  var nat = exFindValue(P, /NATURALIDADE/, null, function(s){ return !!exCityUf(s); });
+  if (nat) out.nat = exCityUf(nat);
+
+  var cpfDig = cpf || '';
+  var rgRe = /(?<![\d.])(\d{1,2}\.?\d{3}\.?\d{3}-?[\dXx]|\d{7,9})(?!\d)/;
+  var orgRe = /\b(SSP|SESP|SJS|SDS|PC|DETRAN|IFP|IGP|SPTC|DIC|IIRGD|POLITEC|SEJUSP|DGPC)\b[\s\/\-]*([A-Z]{2})?\b/;
+  for (var i = 0; i < P.lines.length && !out.rg; i++) {
+    if (!/(REGISTRO GERAL|\bRG\b|DOC(UMENTO)?\.? ?(DE )?IDENTIDADE|IDENTIDADE\/ORG)/.test(P.nl[i])) continue;
+    for (var j = i; j <= i + 2 && j < P.lines.length; j++) {
+      var seg = j === i ? P.lines[j].replace(/^.*?(REGISTRO GERAL|RG|IDENTIDADE)[^\d]*/i, '') : P.lines[j];
+      var m = rgRe.exec(seg);
+      if (!m) continue;
+      var dg = onlyDigits(m[1]);
+      if (cpfDig && cpfDig.indexOf(dg) > -1) continue;
+      if (exParseDate(seg) && onlyDigits(exParseDate(seg)) === dg) continue;
+      out.rg = m[1];
+      var o = orgRe.exec(exNorm(P.lines[j]));
+      if (o) out.orgao = o[1] + (o[2] ? '/' + o[2] : '');
+      break;
+    }
+  }
+  if (!out.orgao) { var o2 = orgRe.exec(P.all); if (o2 && o2[2]) out.orgao = o2[1] + '/' + o2[2]; }
+
+  if (/CERTIDAO DE CASAMENTO/.test(P.all)) {
+    out.estcivil = 'Casado(a)';
+    if (/COMUNHAO PARCIAL/.test(P.all)) out.regime = 'Comunhão parcial de bens';
+    else if (/COMUNHAO UNIVERSAL/.test(P.all)) out.regime = 'Comunhão universal de bens';
+    else if (/SEPARACAO (TOTAL|DE BENS|CONVENCIONAL|OBRIGATORIA)/.test(P.all)) out.regime = 'Separação total de bens';
+    else if (/PARTICIPACAO FINAL/.test(P.all)) out.regime = 'Participação final nos aquestos';
+  }
+  return out;
+}
+
+/* ---- endereço (conta de luz, água, telefone, IPTU) ---- */
+var EX_STREET = /^(RUA|R\.|AV\.?|AVENIDA|ALAMEDA|AL\.|TRAVESSA|TV\.|ESTRADA|ROD\.|RODOVIA|PRACA|PCA|QUADRA|QD\.?|LARGO|VIELA|BECO|CONJUNTO|SITIO|CHACARA)\s+\S/;
+function exParseEndereco(text){
+  var P = exPrep(text), out = {};
+  var cepRe = /(?<!\d)(\d{5})-?(\d{3})(?!\d)/;
+  var best = null;
+  for (var i = 0; i < P.lines.length; i++) {
+    var n = P.nl[i].replace(/^(ENDERECO|END\.?|LOGRADOURO|ENDERECO DE ENTREGA)[:\s]+/, '');
+    if (!EX_STREET.test(n)) continue;
+    var cepIdx = -1;
+    for (var j = Math.max(0, i - 3); j <= Math.min(P.lines.length - 1, i + 4); j++) { if (cepRe.test(P.nl[j])) { cepIdx = j; break; } }
+    var cand = {i: i, cepIdx: cepIdx, line: P.lines[i].replace(/^(endere[cç]o|end\.?|logradouro)[:\s]+/i, '')};
+    if (cepIdx > -1) { best = cand; break; }
+    if (!best) best = cand;
+  }
+  if (best) {
+    out.street = best.line.replace(/\s+-?\s*CEP.*$/i, '').trim().slice(0, 120);
+    var blk = P.lines.slice(Math.max(0, best.i - 1), best.i + 5).join('\n');
+    var b = /BAIRRO[:\s]+([A-Za-zÀ-ÿ0-9 \.]{3,40})/i.exec(blk);
+    if (b) out.bairro = exTitle(b[1].replace(/\s+(CEP|CIDADE|MUNICIPIO).*$/i, '').trim());
+    if (best.cepIdx > -1) {
+      var cl = P.lines[best.cepIdx], cm = cepRe.exec(P.nl[best.cepIdx]);
+      out.cep = cm[1] + '-' + cm[2];
+      var after = cl.slice(cm.index + cm[0].length), before = cl.slice(0, cm.index);
+      var c1 = exCityUf(after.replace(/^[\s,\-–]+/, '')) || exCityUf(before.replace(/CEP[:\s]*$/i, '').replace(/[,\-–\s]+$/, '').replace(/^.*[,\-–]\s*/, ''));
+      if (c1) { var pr = c1.split('/'); out.cidade = pr[0]; out.uf = pr[1]; }
+    }
+  }
+  if (!out.cep) { var cm2 = cepRe.exec(P.all); if (cm2) out.cep = cm2[1] + '-' + cm2[2]; }
+  if (!out.cidade) {
+    var cid = exFindValue(P, /(CIDADE|MUNICIPIO)[:\s]*/, null, function(s){ return /[A-Za-zÀ-ÿ]{3}/.test(s); });
+    if (cid) { var cu = exCityUf(cid); if (cu) { out.cidade = cu.split('/')[0]; out.uf = cu.split('/')[1]; } else out.cidade = exTitle(exCleanName(cid)); }
+  }
+  var tit = exFindValue(P, /\b(NOME|CLIENTE|TITULAR|CONSUMIDOR|CONTRIBUINTE)\b[:\s]*/, /\b(PAI|MAE|BANCO)\b/, exPlausibleName);
+  if (tit) out.titular = exCleanName(exCutName(tit)).toUpperCase();
+  return out;
+}
+
+/* ---- imóvel (escritura, matrícula, IPTU) ---- */
+function exParseImovel(text, tipos){
+  var P = exPrep(text), out = {};
+  tipos = tipos || exClassify(text);
+  var eMat = tipos.indexOf('matricula') > -1;
+  if (eMat) {
+    var mm = /MATRICULA\s*(?:N[O°º\.]*\s*)?[:\-]?\s*(\d[\d\.]{2,11}\d)/.exec(P.all);
+    if (mm) out.matricula = mm[1];
+    var cartorio = null;
+    for (var i = 0; i < P.lines.length; i++) {
+      if (/REGISTRO DE IMOVEIS|OFICIAL DE REGISTRO/.test(P.nl[i]) && P.lines[i].length < 110) { cartorio = P.lines[i]; break; }
+    }
+    if (cartorio) out.cartorio = exTitle(cartorio.replace(/^[\s\.\-:]+/, '').trim()).replace(/([\s\-\/])([A-Za-z]{2})$/, function(m, a, b){ return a + b.toUpperCase(); });
+  }
+  var ins = /(INSCRICAO\s*(MUNICIPAL|CADASTRAL|IMOBILIARIA)?|CADASTRO MUNICIPAL)[^\dA-Z]{0,14}(\d[\d\.\-\/]{5,24}\d)/.exec(P.all);
+  if (ins) out.inscr = ins[3];
+
+  var areas = [], re = /AREA\s*(PRIVATIVA|UTIL|TOTAL|CONSTRUIDA|DO TERRENO|COMUM)?[^\d]{0,25}(\d+[\.,]\d+)\s*M/g, am;
+  while ((am = re.exec(P.all)) && areas.length < 3) {
+    var rot = am[1] ? exTitle(am[1]) : 'Área', val = am[2].replace('.', ',');
+    var txt = (am[1] ? 'Área ' + rot.toLowerCase() : 'Área') + ' de ' + val + ' m²';
+    if (areas.indexOf(txt) < 0) areas.push(txt);
+  }
+  if (areas.length) out.area = areas.join('; ');
+
+  if (/APARTAMENTO/.test(P.all)) out.tipo = 'Apartamento';
+  else if (/LOTE|TERRENO/.test(P.all)) out.tipo = 'Terreno / lote';
+  else if (/SALA COMERCIAL|LOJA/.test(P.all)) out.tipo = 'Sala / loja comercial';
+  else if (/GALPAO/.test(P.all)) out.tipo = 'Galpão';
+  else if (/\bCASA\b/.test(P.all)) out.tipo = 'Casa';
+
+  var cond = /(?:CONDOMINIO|EDIFICIO|EDIF\.)\s+((?:RESIDENCIAL\s+)?[A-Z0-9][A-Z0-9 ]{3,45}?)(?=\s*(?:,|-|\.|SITUAD|LOCALIZAD|NA RUA|NO |\n|$))/.exec(P.all);
+  if (cond) out.cond = exTitle(cond[1].trim());
+
+  var sit = /(?:SITUAD[OA]|LOCALIZAD[OA])\s+(?:A|NA|NO|EM)?\s*((?:RUA|AV\.?|AVENIDA|ALAMEDA|TRAVESSA|ESTRADA|RODOVIA)\s+[A-Z0-9 \.]{3,60}?)\s*,\s*(?:N[O°º]?\.?\s*)?(\d+)/.exec(P.all);
+  var sitBairro = /BAIRRO\s+([A-Z][A-Z \.]{2,40}?)\s*(?:,|\.|CEP|$)/.exec(P.all);
+  var sitCid = /,\s*([A-Z][A-Z ]{2,30}?)\s*\/\s*([A-Z]{2})\b/.exec(P.all.slice(sit ? P.all.indexOf(sit[0]) : 0));
+  var end = exParseEndereco(text);
+  if (sit) {
+    out.street = exTitle(sit[1].trim()) + ', nº ' + sit[2];
+    if (sitBairro) out.bairro = exTitle(sitBairro[1].trim());
+    if (sitCid) { out.cidade = exTitle(sitCid[1].trim()); out.uf = sitCid[2]; }
+  } else if (end.street) out.street = end.street;
+  if (!out.bairro && end.bairro) out.bairro = end.bairro;
+  if (!out.cidade && end.cidade) { out.cidade = end.cidade; out.uf = end.uf; }
+  if (end.cep) out.cep = end.cep;
+
+  var prop = exFindValue(P, /(PROPRIETARI[OA]S?|OUTORGANTE VENDEDOR[A]?|VENDEDOR[A]?|CONTRIBUINTE)[:\s]*/, null, exPlausibleName);
+  if (prop) {
+    out.proprietario = exCleanName(exCutName(prop)).toUpperCase();
+    var pi = P.lines.findIndex(function(l){ return l.indexOf(prop) > -1; });
+    var near = P.lines.slice(Math.max(0, pi - 1), pi + 4).join(' ');
+    var pc = exFirstValidCPF(near);
+    if (pc) out.cpfProp = fmtCPF(pc);
+  }
+  return out;
+}
+
+/* ---- orquestra: decide o que extrair conforme a seção ---- */
+function exExtract(text, alvo){
+  var tipos = exClassify(text), res = {tipos: tipos, campos: {}, avisos: []};
+  var temPessoal = tipos.some(function(t){ return t === 'rg' || t === 'cnh' || t === 'casamento' || t === 'nascimento'; });
+  if (alvo === 'im') {
+    if (tipos.indexOf('matricula') > -1 || tipos.indexOf('iptu') > -1 || tipos.indexOf('conta') > -1) res.campos.imovel = exParseImovel(text, tipos);
+    if (tipos.indexOf('conta') > -1 && !res.campos.imovel) res.campos.imovel = exParseImovel(text, tipos);
+  } else {
+    if (temPessoal) res.campos.pessoal = exParsePessoal(text);
+    if (tipos.indexOf('conta') > -1 || tipos.indexOf('iptu') > -1) res.campos.endereco = exParseEndereco(text);
+    if (!temPessoal && tipos.length === 0) {
+      var pp = exParsePessoal(text);
+      if (pp.cpf || pp.nome) res.campos.pessoal = pp;
+    }
+  }
+  return res;
+}
+
+
+</script>
+<script>
 /* ===== UI: formulário, validação e geração ===== */
 var $ = function(id){ return document.getElementById(id); };
 var UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
@@ -1000,14 +1286,19 @@ async function saveBlob(blob, name){
   } catch (e) { return {ok:false, reason:'unavailable'}; }
 }
 
-$('btn_gen').addEventListener('click', async function(){
+function validateAndShow(){
   document.querySelectorAll('.bad').forEach(clearErr);
   var d = collect(), errs = validate(d);
   if (errs.length) {
     errs.forEach(function(x){ var el = $(x.id); if (el && el.classList) { if (x.id !== 'add_row') el.classList.add('bad'); var e = $('e_' + x.id); if (e) e.textContent = x.msg; } });
-    showMsg('bad', '<strong>Revise ' + errs.length + (errs.length > 1 ? ' pontos' : ' ponto') + ' antes de gerar o PDF:</strong><ul>' + errs.map(function(x){ return '<li><a href="#" data-go="' + x.id + '">' + x.msg + '</a></li>'; }).join('') + '</ul>');
-    return;
+    showMsg('bad', '<strong>Revise ' + errs.length + (errs.length > 1 ? ' pontos' : ' ponto') + ' antes de continuar:</strong><ul>' + errs.map(function(x){ return '<li><a href="#" data-go="' + x.id + '">' + x.msg + '</a></li>'; }).join('') + '</ul>');
+    return null;
   }
+  return d;
+}
+$('btn_gen').addEventListener('click', async function(){
+  var d = validateAndShow();
+  if (!d) return;
   var J = window.jspdf && window.jspdf.jsPDF;
   if (!J) { showMsg('bad', 'A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
   try {
@@ -1017,6 +1308,7 @@ $('btn_gen').addEventListener('click', async function(){
   } catch (e) { showMsg('bad', 'Não foi possível montar o PDF: ' + (e && e.message ? e.message : e)); return; }
   var r = await saveBlob(lastBlob, lastName);
   var resumo = '<div class="sum"><div><span>Proponente</span>' + d.p.nome + '</div><div><span>Imóvel</span>' + d.im.tipo + ' — ' + d.im.cidade + '/' + d.im.uf + '</div><div><span>Valor</span>R$ ' + fmtBRL(d.pg.total) + '</div><div><span>Válida até</span>' + fmtDate(d.pg.validade) + '</div></div>';
+  if (window.AdmStore) { try { AdmStore.marcarPdf(); } catch (e) {} }
   if (r.ok) showMsg('ok', '<strong>PDF gerado.</strong> Arquivo: ' + lastName + '. Envie ao proponente e ao vendedor para assinatura.' + resumo + '<button type="button" class="ghost" id="btn_again">Baixar novamente</button>');
   else if (r.reason === 'declined') showMsg('ok', '<strong>PDF pronto.</strong> Você cancelou o salvamento. Use o botão para baixar quando quiser.' + resumo + '<button type="button" class="ghost" id="btn_again">Baixar PDF</button>');
   else showMsg('bad', 'O PDF foi montado, mas este ambiente não permitiu salvar o arquivo. Abra a página pelo link do artefato no Claude e tente novamente.' + resumo + '<button type="button" class="ghost" id="btn_again">Tentar baixar de novo</button>');
@@ -1044,9 +1336,412 @@ $('btn_clear').addEventListener('click', function(){
   ['t_conj','t_vconj','t_fin','t_com','t_visitou','t_fgts'].forEach(function(id){ $(id).checked = false; $(id).dispatchEvent(new Event('change')); });
   $('rows').innerHTML = ''; addRow('sinal', '', 'Na assinatura'); addRow('saldo', '', '');
   $('m_ref').value = refDefault; $('msg').hidden = true; updateTotals();
+  if (window.AdmStore) AdmStore.reset();
   window.scrollTo({top:0, behavior:'smooth'});
 });
 updateTotals();
+
+</script>
+<script>
+/* ===== SALVAMENTO: rascunhos, propostas salvas, autosave e arquivo .json ===== */
+(function(){
+  var KEY = 'adm_propostas_v1', AUTO = 'adm_autosave_v1', cur = null, restoring = false, timer = null, okStorage = true;
+  function rd(k){ try { return localStorage.getItem(k); } catch (e) { okStorage = false; return null; } }
+  function wr(k, v){ try { localStorage.setItem(k, v); return true; } catch (e) { okStorage = false; return false; } }
+  function rm(k){ try { localStorage.removeItem(k); } catch (e) {} }
+  function lista(){ try { return JSON.parse(rd(KEY) || '[]'); } catch (e) { return []; } }
+  function gravaLista(l){ return wr(KEY, JSON.stringify(l)); }
+  function two(n){ return (n < 10 ? '0' : '') + n; }
+  function quando(ts){ var d = new Date(ts); return two(d.getDate()) + '/' + two(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + two(d.getHours()) + ':' + two(d.getMinutes()); }
+
+  function snapshot(){
+    var f = {}, c = {}, a = [];
+    document.querySelectorAll('input, select, textarea').forEach(function(el){
+      var id = el.id;
+      if (!id || el.type === 'file' || /^r\d+_/.test(id) || /^mode_/.test(id)) return;
+      if (el.type === 'checkbox') c[id] = el.checked;
+      else { f[id] = el.value; if (el.classList.contains('auto')) a.push(id); }
+    });
+    var rows = Array.prototype.slice.call($('rows').children).map(function(r){
+      return {g: $(r.id + '_g').value, d: $(r.id + '_d').value, v: $(r.id + '_v').value, m: $(r.id + '_m').value};
+    });
+    return {f: f, c: c, a: a, rows: rows};
+  }
+  function restore(s){
+    restoring = true;
+    try {
+      document.querySelectorAll('.auto').forEach(function(el){ el.classList.remove('auto'); });
+      Object.keys(s.f || {}).forEach(function(id){ var el = $(id); if (el) el.value = s.f[id]; });
+      Object.keys(s.c || {}).forEach(function(id){ var el = $(id); if (el) { el.checked = !!s.c[id]; el.dispatchEvent(new Event('change')); } });
+      (s.a || []).forEach(function(id){ var el = $(id); if (el) el.classList.add('auto'); });
+      $('rows').innerHTML = '';
+      (s.rows && s.rows.length ? s.rows : [{g:'sinal', v:'Na assinatura'}, {g:'saldo'}]).forEach(function(r){
+        addRow(r.g, r.d, r.v); var last = $('rows').lastElementChild; $(last.id + '_m').value = r.m || '';
+      });
+      updateTotals();
+    } finally { restoring = false; }
+  }
+  function titulo(s){
+    var n = (s.f.p_nome || '').trim(), im = [s.f.im_cond, s.f.im_cidade].filter(Boolean).join(' · ');
+    return (n || 'Sem nome') + (im ? ' — ' + im : '');
+  }
+  function aviso(kind, html){ showMsg(kind, html); }
+
+  function salvar(status, silencioso){
+    var s = snapshot(), l = lista(), agora = Date.now(), i;
+    if (!cur) cur = 'p' + agora.toString(36);
+    var rec = {id: cur, status: status, savedAt: agora, title: titulo(s), data: s};
+    for (i = 0; i < l.length; i++) if (l[i].id === cur) break;
+    if (i < l.length) l[i] = rec; else l.unshift(rec);
+    var ok = gravaLista(l);
+    if (ok) rm(AUTO);
+    desenharLista();
+    marca(ok ? 'Salvo às ' + quando(agora).slice(11) : 'Não foi possível salvar neste navegador');
+    return {ok: ok, rec: rec};
+  }
+  function marca(t){ var h = $('save_hint'); if (h) h.textContent = t; }
+
+  function baixarJson(rec){
+    var blob = new Blob([JSON.stringify({app:'adm-proposta', v:1, record:rec}, null, 1)], {type:'application/json'});
+    var nome = 'Proposta_' + (slug(rec.data.f.p_nome || 'sem_nome') || 'sem_nome') + '_' + (rec.status === 'rascunho' ? 'rascunho' : 'salva') + '.json';
+    return saveBlob(blob, nome);
+  }
+
+  function aposSalvar(status){
+    var r = salvar(status);
+    var rotulo = status === 'rascunho' ? 'Rascunho' : 'Proposta';
+    if (r.ok) aviso('ok', '<strong>' + rotulo + ' salvo neste navegador.</strong> Para abrir depois, use “Propostas salvas” no topo. Se for trocar de aparelho ou limpar o navegador, baixe uma cópia.<br><button type="button" class="ghost" id="btn_json">Baixar cópia (.json)</button>');
+    else aviso('bad', '<strong>Este ambiente não permite salvar no navegador.</strong> Baixe a cópia em arquivo para não perder o que foi preenchido.<br><button type="button" class="ghost" id="btn_json">Baixar cópia (.json)</button>');
+    lastRec = r.rec;
+  }
+  var lastRec = null;
+
+  function desenharLista(){
+    var l = lista(), box = $('saved_list');
+    $('saved_n').textContent = l.length;
+    if (!box) return;
+    if (!l.length) { box.innerHTML = '<p class="muted">Nenhuma proposta salva neste navegador ainda.</p>'; return; }
+    box.innerHTML = l.map(function(r){
+      var st = {rascunho:'Rascunho', salva:'Salva', pdf:'PDF gerado'}[r.status] || r.status;
+      return '<div class="srow"><div><b>' + escH(r.title) + '</b><small>' + st + ' · ' + quando(r.savedAt) + '</small></div>' +
+        '<div class="sbtn"><button type="button" class="ghost" data-open="' + r.id + '">Abrir</button><button type="button" class="ghost" data-json="' + r.id + '">.json</button><button type="button" class="ghost" data-del="' + r.id + '">Excluir</button></div></div>';
+    }).join('');
+  }
+  function escH(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  document.addEventListener('click', async function(e){
+    var t = e.target, o = t.getAttribute && t.getAttribute('data-open'), dj = t.getAttribute && t.getAttribute('data-json'), dl = t.getAttribute && t.getAttribute('data-del');
+    var l;
+    if (o) { l = lista().filter(function(r){ return r.id === o; })[0]; if (l) { restore(l.data); cur = l.id; $('msg').hidden = true; marca('Aberto: ' + l.title); window.scrollTo({top:0, behavior:'smooth'}); } }
+    else if (dj) { l = lista().filter(function(r){ return r.id === dj; })[0]; if (l) await baixarJson(l); }
+    else if (dl) {
+      if (t.getAttribute('data-sure') !== '1') { t.setAttribute('data-sure', '1'); t.textContent = 'Confirmar exclusão'; setTimeout(function(){ if (t.isConnected) { t.removeAttribute('data-sure'); t.textContent = 'Excluir'; } }, 4000); return; }
+      gravaLista(lista().filter(function(r){ return r.id !== dl; })); if (cur === dl) cur = null; desenharLista();
+    }
+    else if (t.id === 'btn_json' && lastRec) await baixarJson(lastRec);
+  });
+
+  $('imp').addEventListener('change', async function(){
+    var f = this.files[0]; this.value = '';
+    if (!f) return;
+    try {
+      var j = JSON.parse(await f.text()), rec = j && j.record;
+      if (!rec || !rec.data || !rec.data.f) throw new Error('x');
+      restore(rec.data); cur = null; $('msg').hidden = true;
+      marca('Arquivo aberto: ' + (rec.title || f.name));
+      aviso('ok', '<strong>Arquivo aberto.</strong> Confira os dados e use “Salvar rascunho” para guardar neste navegador.');
+    } catch (e) { aviso('bad', 'Este arquivo não é uma proposta salva por este formulário.'); }
+  });
+
+  $('btn_draft').addEventListener('click', function(){ aposSalvar('rascunho'); });
+  $('btn_save').addEventListener('click', function(){
+    if (validateAndShow()) aposSalvar('salva');
+  });
+
+  /* autosave */
+  function agendar(){
+    if (restoring) return;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ wr(AUTO, JSON.stringify({savedAt: Date.now(), data: snapshot()})); }, 1500);
+  }
+  document.addEventListener('input', agendar);
+  document.addEventListener('change', agendar);
+
+  function checarRestauro(){
+    var raw = rd(AUTO); if (!raw) return;
+    try {
+      var a = JSON.parse(raw), s = a.data;
+      var vazio = !Object.keys(s.f).some(function(k){ return /^(p|c|v|vc|im)_/.test(k) && s.f[k] && k !== 'p_nac' && k !== 'c_nac' && k !== 'im_sit'; });
+      if (vazio) { rm(AUTO); return; }
+      var b = $('restore_bar');
+      b.innerHTML = '<strong>Há um preenchimento não salvo de ' + quando(a.savedAt) + '</strong> (' + escH(titulo(s)) + '). <div class="rb"><button type="button" class="primary" id="rb_yes">Restaurar</button><button type="button" class="ghost" id="rb_no">Descartar</button></div>';
+      b.hidden = false;
+      $('rb_yes').addEventListener('click', function(){ restore(s); b.hidden = true; marca('Restaurado'); });
+      $('rb_no').addEventListener('click', function(){ rm(AUTO); b.hidden = true; });
+    } catch (e) { rm(AUTO); }
+  }
+
+  window.AdmStore = {
+    snapshot: snapshot, restore: restore, salvar: salvar, lista: lista,
+    marcarPdf: function(){ salvar('pdf'); },
+    reset: function(){ cur = null; rm(AUTO); marca(''); document.querySelectorAll('.auto').forEach(function(el){ el.classList.remove('auto'); }); }
+  };
+  desenharLista();
+  checarRestauro();
+})();
+
+</script>
+<script>
+/* ===== DOCUMENTOS: modo manual/automático, upload, leitura (PDF/OCR) e preenchimento ===== */
+(function(){
+  var LIBS = {
+    pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+    pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+    ocr: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'
+  };
+  var loaded = {}, worker = null, workerP = null, chain = Promise.resolve();
+
+  function loadScript(src){
+    if (loaded[src]) return loaded[src];
+    loaded[src] = new Promise(function(res, rej){
+      var s = document.createElement('script'); s.src = src; s.async = true;
+      s.onload = res; s.onerror = function(){ delete loaded[src]; rej(new Error('Não foi possível carregar o leitor de documentos. Verifique a conexão.')); };
+      document.head.appendChild(s);
+    });
+    return loaded[src];
+  }
+  function lsGet(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* ---------- modo ---------- */
+  function setMode(m){
+    document.body.setAttribute('data-mode', m);
+    $('mode_auto').setAttribute('aria-pressed', m === 'auto');
+    $('mode_manual').setAttribute('aria-pressed', m === 'manual');
+    lsSet('adm_mode', m);
+  }
+  $('mode_auto').addEventListener('click', function(){ setMode('auto'); });
+  $('mode_manual').addEventListener('click', function(){ setMode('manual'); });
+  setMode(lsGet('adm_mode') === 'manual' ? 'manual' : 'auto');
+
+  /* ---------- preenchimento ---------- */
+  function fieldLabel(id){ var l = document.querySelector('label[for="' + id + '"]'); return l ? l.textContent.replace(/\s*\*\s*$/, '') : id; }
+  function setAuto(id, val){
+    var el = $(id);
+    if (!el || !val) return false;
+    if (el.value && !el.classList.contains('auto')) return false;
+    if (el.tagName === 'SELECT') {
+      var ok = false;
+      Array.prototype.forEach.call(el.options, function(o){ if (o.value === val || o.text === val) { el.value = o.value; ok = true; } });
+      if (!ok) return false;
+    } else el.value = val;
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+    el.classList.add('auto');
+    el.title = 'Preenchido automaticamente — confira com o documento';
+    return true;
+  }
+  document.addEventListener('input', function(e){ if (e.isTrusted && e.target.classList) e.target.classList.remove('auto'); });
+  document.addEventListener('change', function(e){ if (e.isTrusted && e.target.classList) e.target.classList.remove('auto'); });
+
+  function linhaEndereco(a){
+    var p = [a.street];
+    if (a.bairro) p.push(a.bairro);
+    if (a.cidade) p.push(a.cidade + (a.uf ? '/' + a.uf : ''));
+    if (a.cep) p.push('CEP ' + a.cep);
+    return p.filter(Boolean).join(', ');
+  }
+  var MAPA = {
+    p: {nome:'p_nome', rg:'p_rg', orgao:'p_orgao', cpf:'p_cpf', nasc:'p_nasc', nat:'p_nat', estcivil:'p_estcivil'},
+    c: {nome:'c_nome', rg:'c_rg', orgao:'c_orgao', cpf:'c_cpf', nasc:'c_nasc', nat:'c_nat', regime:'c_regime'},
+    v: {nome:'v_nome', cpf:'v_doc', estcivil:'v_estcivil'}
+  };
+  var ROT = {nome:'Nome', cpf:'CPF', rg:'RG', nasc:'Nascimento', street:'Endereço', cep:'CEP', cidade:'Cidade', matricula:'Matrícula', area:'Área'};
+  var ESPERADO = {rg:['nome','cpf','rg','nasc'], cnh:['nome','cpf','rg','nasc'], conta:['street','cep','cidade'], matricula:['matricula','street','area']};
+
+  function aplicar(alvo, res){
+    var feitos = [], avisos = [];
+    function put(id, val){ if (setAuto(id, val)) feitos.push(fieldLabel(id)); }
+    var c = res.campos;
+    if (alvo !== 'im') {
+      var mp = MAPA[alvo];
+      if (c.pessoal) {
+        Object.keys(c.pessoal).forEach(function(k){ if (mp[k]) put(mp[k], c.pessoal[k]); });
+      }
+      if (c.endereco && c.endereco.street) {
+        var a = c.endereco;
+        if (alvo === 'p') { put('p_endres', a.street + (a.bairro ? ', ' + a.bairro : '')); put('p_cidade', a.cidade ? a.cidade + (a.uf ? '/' + a.uf : '') : ''); put('p_cep', a.cep); }
+        else if (alvo === 'c') put('c_end', linhaEndereco(a));
+        else put('v_end', linhaEndereco(a));
+        var campoNome = $(alvo === 'v' ? 'v_nome' : alvo + '_nome');
+        if (a.titular && campoNome && campoNome.value && exNorm(campoNome.value).split(' ')[0] !== exNorm(a.titular).split(' ')[0])
+          avisos.push('O comprovante está em nome de ' + exTitle(a.titular) + '. Confira se o endereço é de quem está sendo qualificado.');
+      }
+    } else if (c.imovel) {
+      var im = c.imovel;
+      put('im_tipo', im.tipo);
+      put('im_end', im.street ? im.street + (im.bairro ? ', ' + im.bairro : '') : '');
+      put('im_cidade', im.cidade); put('im_uf', im.uf);
+      put('im_cond', im.cond);
+      put('im_desc', im.area);
+      put('im_matricula', im.matricula ? 'Matrícula nº ' + im.matricula + (im.cartorio ? ' — ' + im.cartorio : '') : '');
+      put('im_inscr', im.inscr);
+      if (im.proprietario) {
+        put('v_nome', im.proprietario);
+        if (im.cpfProp) put('v_doc', im.cpfProp);
+      }
+    }
+    var perdidos = [];
+    res.tipos.forEach(function(t){
+      (ESPERADO[t] || []).forEach(function(k){
+        var obj = c.pessoal || c.endereco || c.imovel || {};
+        if (!obj[k] && perdidos.indexOf(ROT[k]) < 0) perdidos.push(ROT[k]);
+      });
+    });
+    return {feitos: feitos, perdidos: perdidos, avisos: avisos};
+  }
+
+  /* ---------- leitura (PDF e imagem) ---------- */
+  async function getWorker(onStatus){
+    if (worker) return worker;
+    if (!workerP) workerP = (async function(){
+      await loadScript(LIBS.ocr);
+      var w = await window.Tesseract.createWorker('por', 1, {logger: function(m){
+        if (m && m.status && onStatus) onStatus(m.status === 'recognizing text' ? 'Lendo texto… ' + Math.round((m.progress || 0) * 100) + '%' : 'Preparando leitor…');
+      }});
+      worker = w; return w;
+    })();
+    try { return await workerP; } catch (e) { workerP = null; throw e; }
+  }
+  function toCanvas(img, maxDim){
+    var w = img.width || img.naturalWidth, h = img.height || img.naturalHeight, s = Math.min(1, maxDim / Math.max(w, h));
+    var cv = document.createElement('canvas'); cv.width = Math.round(w * s); cv.height = Math.round(h * s);
+    var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, cv.width, cv.height);
+    try {
+      var id = cx.getImageData(0, 0, cv.width, cv.height), d = id.data;
+      for (var i = 0; i < d.length; i += 4) { var g = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0; d[i] = d[i+1] = d[i+2] = g; }
+      cx.putImageData(id, 0, 0);
+    } catch (e) {}
+    return cv;
+  }
+  function loadImage(file){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function(){ URL.revokeObjectURL(url); res(im); };
+      im.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('Imagem inválida ou formato não suportado.')); };
+      im.src = url;
+    });
+  }
+  async function ocr(canvas, onStatus){
+    var w = await getWorker(onStatus);
+    var r = await w.recognize(canvas);
+    return (r && r.data && r.data.text) || '';
+  }
+  async function lerArquivo(file, onStatus){
+    var isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (!isPdf) {
+      onStatus('Abrindo imagem…');
+      var im = await loadImage(file);
+      return ocr(toCanvas(im, 2400), onStatus);
+    }
+    onStatus('Abrindo PDF…');
+    await loadScript(LIBS.pdf);
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.pdfWorker;
+    var pdf = await window.pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
+    var n = Math.min(pdf.numPages, 6), texto = '';
+    for (var i = 1; i <= n; i++) {
+      var page = await pdf.getPage(i), tc = await page.getTextContent(), linhas = {}, ys = [];
+      tc.items.forEach(function(it){
+        var y = Math.round(it.transform[5] / 3);
+        if (!linhas[y]) { linhas[y] = []; ys.push(y); }
+        linhas[y].push({x: it.transform[4], s: it.str});
+      });
+      ys.sort(function(a, b){ return b - a; });
+      texto += ys.map(function(y){ return linhas[y].sort(function(a, b){ return a.x - b.x; }).map(function(o){ return o.s; }).join(' '); }).join('\n') + '\n';
+    }
+    if (texto.replace(/\s/g, '').length >= 40) return texto;
+    var ocrTxt = '';
+    for (var j = 1; j <= n; j++) {
+      onStatus('PDF digitalizado: lendo página ' + j + ' de ' + n + '…');
+      var pg = await pdf.getPage(j), vp = pg.getViewport({scale: 2}), cv = document.createElement('canvas');
+      cv.width = vp.width; cv.height = vp.height;
+      await pg.render({canvasContext: cv.getContext('2d'), viewport: vp}).promise;
+      ocrTxt += (await ocr(cv, onStatus)) + '\n';
+    }
+    return ocrTxt;
+  }
+
+  /* ---------- painéis de upload ---------- */
+  var PAINEIS = {
+    p: {id:'dz_p', t:'Documentos do comprador', d:'RG ou CNH, comprovante de endereço (conta de luz, água, telefone), certidão de casamento.'},
+    c: {id:'dz_c', t:'Documentos do cônjuge / segundo comprador', d:'RG ou CNH, comprovante de endereço, certidão de casamento.'},
+    v: {id:'dz_v', t:'Documentos do vendedor (proprietário)', d:'RG ou CNH, comprovante de endereço, certidão de casamento.'},
+    im: {id:'dz_im', t:'Documentos do imóvel', d:'Escritura, matrícula, IPTU ou conta de luz/água do imóvel. Se o proprietário constar, preenche também o vendedor.'}
+  };
+  var estado = {};
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  Object.keys(PAINEIS).forEach(function(alvo){
+    var P = PAINEIS[alvo], root = $(P.id);
+    if (!root) return;
+    estado[alvo] = [];
+    root.className = 'docs';
+    root.innerHTML =
+      '<div class="docs-h"><strong>Preencher a partir de documentos</strong><span>' + esc(P.d) + '</span></div>' +
+      '<label class="drop" id="drop_' + alvo + '" for="in_' + alvo + '">Toque para escolher fotos ou PDFs, ou arraste os arquivos aqui</label>' +
+      '<input type="file" id="in_' + alvo + '" multiple accept="image/*,application/pdf" hidden aria-label="' + esc(P.t) + '">' +
+      '<ul class="dlist" id="dl_' + alvo + '" aria-live="polite"></ul>' +
+      '<div class="docs-f"><small>A leitura é feita neste aparelho. Os arquivos não são enviados nem guardados. Fotos nítidas, com o documento inteiro e bem iluminado, dão melhor resultado. Campos preenchidos ficam marcados em azul: confira cada um.</small>' +
+      '<button type="button" class="ghost" id="re_' + alvo + '" hidden>Reaplicar dados lidos</button></div>';
+    var inp = $('in_' + alvo), drop = $('drop_' + alvo);
+    inp.addEventListener('change', function(){ enfileirar(alvo, Array.prototype.slice.call(inp.files)); inp.value = ''; });
+    ['dragover', 'dragenter'].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); }); });
+    ['dragleave', 'drop'].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); }); });
+    drop.addEventListener('drop', function(e){ enfileirar(alvo, Array.prototype.slice.call(e.dataTransfer.files)); });
+    $('re_' + alvo).addEventListener('click', function(){
+      estado[alvo].forEach(function(it){ if (it.res) { it.out = aplicar(alvo, it.res); desenhar(alvo); } });
+    });
+  });
+
+  function desenhar(alvo){
+    var ul = $('dl_' + alvo);
+    ul.innerHTML = estado[alvo].map(function(it){
+      var corpo;
+      if (it.erro) corpo = '<span class="st bad">' + esc(it.erro) + '</span>';
+      else if (!it.res) corpo = '<span class="st">' + esc(it.status || 'Na fila…') + '</span>';
+      else {
+        var tipo = it.res.tipos.length ? it.res.tipos.map(function(t){ return EX_NOMES[t]; }).join(' + ') : EX_NOMES.outro;
+        var o = it.out || {feitos: [], perdidos: [], avisos: []};
+        corpo = '<span class="st ok">' + esc(tipo) + '</span>' +
+          (o.feitos.length ? '<span class="det">Preenchido: ' + esc(o.feitos.join(', ')) + '</span>' : '<span class="det">Nenhum campo novo preenchido (campos já preenchidos manualmente são preservados).</span>') +
+          (o.perdidos.length ? '<span class="det warnt">Não localizado: ' + esc(o.perdidos.join(', ')) + '. Preencha manualmente.</span>' : '') +
+          o.avisos.map(function(a){ return '<span class="det warnt">' + esc(a) + '</span>'; }).join('');
+      }
+      return '<li><b>' + esc(it.nome) + '</b>' + corpo + '</li>';
+    }).join('');
+    $('re_' + alvo).hidden = !estado[alvo].some(function(it){ return it.res; });
+  }
+
+  function enfileirar(alvo, arquivos){
+    arquivos.forEach(function(f){
+      var it = {nome: f.name, status: 'Na fila…'};
+      estado[alvo].push(it);
+      chain = chain.then(async function(){
+        try {
+          it.status = 'Iniciando…'; desenhar(alvo);
+          var txt = await lerArquivo(f, function(s){ it.status = s; desenhar(alvo); });
+          it.res = exExtract(txt, alvo);
+          it.out = aplicar(alvo, it.res);
+          it.texto = txt.length;
+          if (!it.res.tipos.length && !Object.keys(it.res.campos).length) it.erro = 'Não consegui identificar o tipo deste documento. Tente uma foto mais nítida ou preencha manualmente.';
+        } catch (e) { it.erro = (e && e.message) ? e.message : 'Falha ao ler o arquivo.'; }
+        desenhar(alvo);
+      });
+    });
+    desenhar(alvo);
+  }
+
+  window.AdmDocs = {setAuto: setAuto, aplicar: aplicar, enfileirar: enfileirar, _lerArquivo: lerArquivo};
+})();
 
 </script>
 </body>
