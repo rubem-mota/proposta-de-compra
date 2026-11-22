@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proposta de Compra Adm House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: formulário em coluna única, em seções que espelham as partes do documento final (proponente, vendedor, imóvel, condições). */
+:root{
+  --bg:#f4f5f8; --surface:#ffffff; --ink:#1c1e24; --muted:#5d6577; --line:#d9dde6;
+  --navy:#1b2a4a; --navy-ink:#ffffff; --soft:#eceff6; --ok:#17603a; --ok-bg:#e5f4ec; --bad:#a02323; --bad-bg:#fbeaea; --warn:#8a5a00; --warn-bg:#fdf3dc;
+  --f-body:'Source Sans 3',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --f-head:'Source Serif 4',Georgia,'Times New Roman',serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13161d; --surface:#1b1f29; --ink:#e8eaf0; --muted:#a2a9b9; --line:#2f3646;
+    --navy:#8fa6d8; --navy-ink:#10151f; --soft:#242a38; --ok:#7fd1a0; --ok-bg:#16301f; --bad:#f08d8d; --bad-bg:#3a1c1c; --warn:#f0c26a; --warn-bg:#3a2e14;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13161d; --surface:#1b1f29; --ink:#e8eaf0; --muted:#a2a9b9; --line:#2f3646;
+  --navy:#8fa6d8; --navy-ink:#10151f; --soft:#242a38; --ok:#7fd1a0; --ok-bg:#16301f; --bad:#f08d8d; --bad-bg:#3a1c1c; --warn:#f0c26a; --warn-bg:#3a2e14;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+.wrap{max-width:880px;margin:0 auto;padding:24px 16px 120px}
+header.top{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+header.top .brand{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-head);font-size:clamp(26px,5vw,34px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 20px;margin-bottom:16px}
+section.card > h2{font-family:var(--f-head);font-size:19px;margin:0 0 2px;color:var(--navy);text-wrap:balance}
+section.card > .lead{margin:0 0 14px;color:var(--muted);font-size:14.5px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px 14px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s2{grid-column:span 2}.s12{grid-column:span 12}
+@media (max-width:640px){ .grid > .f{grid-column:span 12} }
+label{font-size:13.5px;font-weight:600;color:var(--ink)}
+.rq{color:var(--bad)}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:9px 10px;width:100%;min-height:42px}
+textarea{resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+input.bad,select.bad,textarea.bad{border-color:var(--bad);background:var(--bad-bg)}
+small{color:var(--muted);font-size:12.5px}
+.err{color:var(--bad);font-size:12.5px;min-height:0}
+.err:empty{display:none}
+.check{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;font-weight:500}
+.check input{width:20px;height:20px;min-height:0;margin:2px 0 0;flex:none;accent-color:var(--navy)}
+.check label{font-weight:500;font-size:15px}
+.sub{margin-top:12px;padding-top:14px;border-top:1px dashed var(--line)}
+details.cfg{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 18px;margin-bottom:16px}
+details.cfg summary{cursor:pointer;font-weight:600;color:var(--navy)}
+details.cfg .grid{margin-top:14px}
+.prow{display:grid;grid-template-columns:140px 1fr 170px 140px auto;gap:10px;align-items:end;padding:12px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+@media (max-width:760px){ .prow{grid-template-columns:1fr 1fr} .prow .pd,.prow .pg{grid-column:span 2} .prow .rm{grid-column:span 2} }
+button{font:inherit;cursor:pointer;border-radius:8px;padding:10px 16px;min-height:42px;border:1px solid var(--navy)}
+button.primary{background:var(--navy);color:var(--navy-ink);font-weight:700}
+button.ghost{background:transparent;color:var(--navy)}
+button:hover{filter:brightness(1.08)}
+.tot{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--soft)}
+.tot div span{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tot div b{font-variant-numeric:tabular-nums;font-size:16px}
+.tot.ok #tot_dif{color:var(--ok)}
+.tot.warn #tot_dif{color:var(--warn)}
+.tot .ext{grid-column:span 4;font-size:14px;color:var(--muted)}
+@media (max-width:640px){ .tot{grid-template-columns:1fr 1fr} .tot .ext{grid-column:span 2} }
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px;z-index:5}
+.bar .in{max-width:880px;margin:0 auto;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.bar .hint{font-size:13.5px;color:var(--muted);flex:1 1 220px}
+.msg{border-radius:10px;padding:14px 16px;margin:0 0 16px;border:1px solid var(--line)}
+.msg.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ink)}
+.msg.bad{background:var(--bad-bg);border-color:var(--bad)}
+.msg ul{margin:8px 0 0;padding-left:20px}
+.msg a{color:var(--ink)}
+.msg button{margin-top:12px}
+.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 16px;margin-top:10px}
+.sum span{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Adm House · Intermediação de imóveis</span>
+    <h1>Proposta de compra de imóvel</h1>
+    <p>Preencha os campos e gere o PDF. O documento sai pronto para assinatura do comprador e do vendedor (proprietário), com o aceite do vendedor no final. Campos com * são obrigatórios.</p>
+  </header>
+
+  <div id="msg" class="msg" hidden role="status" aria-live="polite"></div>
+
+  <details class="cfg">
+    <summary>Dados da imobiliária (já preenchidos, editáveis)</summary>
+    <div class="grid" id="f_cfg"></div>
+  </details>
+
+  <section class="card">
+    <h2>Identificação da proposta</h2>
+    <div class="grid" id="f_meta"></div>
+  </section>
+
+  <section class="card">
+    <h2>Proponente comprador</h2>
+    <p class="lead">Dados de quem faz a proposta e assina como comprador.</p>
+    <div class="grid" id="f_p"></div>
+    <div class="check"><input type="checkbox" id="t_conj"><label for="t_conj">Há cônjuge, companheiro(a) ou segundo comprador</label></div>
+    <div id="box_conj" class="sub" hidden>
+      <div class="grid" id="f_c"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Vendedor (proprietário do imóvel)</h2>
+    <p class="lead">O vendedor assina o aceite desta proposta. Se for casado ou viver em união estável, o cônjuge também assina, em anuência.</p>
+    <div class="grid" id="f_v"></div>
+    <div class="check"><input type="checkbox" id="t_vconj"><label for="t_vconj">O vendedor tem cônjuge ou companheiro(a) que deve assinar</label></div>
+    <div id="box_vconj" class="sub" hidden>
+      <div class="grid" id="f_vc"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Imóvel</h2>
+    <div class="grid" id="f_im"></div>
+    <div class="check"><input type="checkbox" id="t_visitou"><label for="t_visitou">O proponente já visitou e conferiu o imóvel</label></div>
+  </section>
+
+  <section class="card">
+    <h2>Condições comerciais</h2>
+    <div class="grid" id="f_pg"></div>
+
+    <div class="sub">
+      <strong>Forma de pagamento</strong>
+      <p class="lead" style="margin:2px 0 0">Distribua o valor total entre sinal/entrada e saldo. A soma precisa fechar com o valor total.</p>
+      <div id="rows"></div>
+      <button type="button" class="ghost" id="add_row">Adicionar linha</button>
+      <div class="tot warn" id="tot" aria-live="polite">
+        <div><span>Valor total</span><b id="tot_total">R$ 0,00</b></div>
+        <div><span>Soma das linhas</span><b id="tot_soma">R$ 0,00</b></div>
+        <div><span>Situação</span><b id="tot_dif">—</b></div>
+        <div></div>
+        <div class="ext" id="tot_ext"></div>
+      </div>
+    </div>
+
+    <div class="check"><input type="checkbox" id="t_fin"><label for="t_fin">Parte do pagamento será feita com financiamento bancário</label></div>
+    <div id="box_fin" class="sub" hidden><div class="grid" id="f_fin"></div></div>
+    <div class="check"><input type="checkbox" id="t_fgts"><label for="t_fgts">Será utilizado FGTS</label></div>
+
+    <div class="check"><input type="checkbox" id="t_com"><label for="t_com">Incluir cláusula de corretagem em caso de desistência do proponente após o aceite</label></div>
+    <div id="box_com" class="sub" hidden><div class="grid" id="f_com"></div></div>
+
+    <div class="sub"><div class="grid" id="f_esp"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>Corretor responsável</h2>
+    <div class="grid" id="f_corr"></div>
+  </section>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <span class="hint">O PDF é montado no seu navegador. Nenhum dado é enviado para fora desta página.</span>
+    <div style="display:flex;gap:10px">
+      <button type="button" class="ghost" id="btn_clear">Limpar formulário</button>
+      <button type="button" class="primary" id="btn_gen">Gerar PDF para assinatura</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ===== CORE: utilitários + gerador de PDF (sem dependência de DOM) ===== */
+function onlyDigits(s){ return String(s||'').replace(/\D/g,''); }
+
+function validCPF(v){
+  var c = onlyDigits(v);
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  for (var t = 9; t < 11; t++) {
+    var s = 0;
+    for (var i = 0; i < t; i++) s += parseInt(c[i],10) * (t + 1 - i);
+    var dv = ((s * 10) % 11) % 10;
+    if (dv !== parseInt(c[t],10)) return false;
+  }
+  return true;
+}
+function validCNPJ(v){
+  var c = onlyDigits(v);
+  if (c.length !== 14 || /^(\d)\1{13}$/.test(c)) return false;
+  function dv(len){
+    var pesos = len === 12 ? [5,4,3,2,9,8,7,6,5,4,3,2] : [6,5,4,3,2,9,8,7,6,5,4,3,2];
+    var s = 0;
+    for (var i = 0; i < len; i++) s += parseInt(c[i],10) * pesos[i];
+    var r = s % 11;
+    return r < 2 ? 0 : 11 - r;
+  }
+  return dv(12) === parseInt(c[12],10) && dv(13) === parseInt(c[13],10);
+}
+function fmtCPF(v){
+  var c = onlyDigits(v).slice(0,11);
+  return c.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+}
+function fmtCNPJ(v){
+  var c = onlyDigits(v).slice(0,14);
+  return c.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2');
+}
+function fmtDoc(v){ var c = onlyDigits(v); return c.length > 11 ? fmtCNPJ(c) : fmtCPF(c); }
+function fmtCEP(v){ var c = onlyDigits(v).slice(0,8); return c.length > 5 ? c.slice(0,5) + '-' + c.slice(5) : c; }
+function fmtFone(v){
+  var c = onlyDigits(v).slice(0,11);
+  if (c.length > 10) return c.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  if (c.length > 6) return c.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  if (c.length > 2) return c.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  return c;
+}
+function fmtBRL(n){
+  return (Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function parseMoney(s){
+  var t = String(s||'').replace(/\./g,'').replace(',','.').replace(/[^\d.\-]/g,'');
+  var n = parseFloat(t);
+  return isNaN(n) ? 0 : Math.round(n*100)/100;
+}
+function fmtDate(iso){
+  if (!iso) return '';
+  var p = String(iso).split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
+}
+var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function dataExtenso(iso){
+  if (!iso) return '';
+  var p = String(iso).split('-');
+  return parseInt(p[2],10) + ' de ' + MESES[parseInt(p[1],10)-1] + ' de ' + p[0];
+}
+
+/* ---- valor por extenso (pt-BR) ---- */
+var UN = ['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+var DZ = ['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+var CT = ['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+function ate999(x){
+  if (x === 0) return '';
+  if (x === 100) return 'cem';
+  var p = [], c = Math.floor(x/100), r = x % 100;
+  if (c) p.push(CT[c]);
+  if (r) {
+    if (r < 20) p.push(UN[r]);
+    else { var d = Math.floor(r/10), u = r % 10; p.push(DZ[d] + (u ? ' e ' + UN[u] : '')); }
+  }
+  return p.join(' e ');
+}
+function extensoInt(n){
+  if (n === 0) return 'zero';
+  var escalas = [
+    {v:1e9, s:'bilhão', p:'bilhões'},
+    {v:1e6, s:'milhão', p:'milhões'},
+    {v:1e3, s:'mil', p:'mil'}
+  ];
+  var partes = [], resto = n;
+  escalas.forEach(function(e){
+    var q = Math.floor(resto / e.v);
+    if (q > 0) {
+      resto -= q * e.v;
+      if (e.v === 1e3) partes.push({txt: (q === 1 ? '' : ate999(q) + ' ') + 'mil', val: q});
+      else partes.push({txt: ate999(q) + ' ' + (q === 1 ? e.s : e.p), val: q});
+    }
+  });
+  if (resto > 0) partes.push({txt: ate999(resto), val: resto});
+  var out = '';
+  partes.forEach(function(pt, i){
+    if (i === 0) { out = pt.txt; return; }
+    var ultimo = i === partes.length - 1;
+    var liga = (ultimo && (pt.val < 100 || pt.val % 100 === 0)) ? ' e ' : ' ';
+    out += liga + pt.txt;
+  });
+  return out.replace(/\s+/g,' ').trim();
+}
+function valorExtenso(v){
+  v = Math.round((Number(v)||0)*100)/100;
+  var reais = Math.floor(v), cent = Math.round((v - reais)*100);
+  var partes = [];
+  if (reais > 0) {
+    var t = extensoInt(reais);
+    var de = (reais % 1e6 === 0) ? ' de' : '';
+    partes.push(t + de + (reais === 1 ? ' real' : ' reais'));
+  }
+  if (cent > 0) partes.push(extensoInt(cent) + (cent === 1 ? ' centavo' : ' centavos'));
+  return partes.length ? partes.join(' e ') : 'zero real';
+}
+function romano(n){ return ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][n] || String(n); }
+
+/* ---- cláusulas (numeração dinâmica, sem referências cruzadas por número fixo) ---- */
+function buildClauses(d){
+  var C = d.cfg, pg = d.pg, im = d.im;
+  var sinalRows = pg.pagamentos.filter(function(r){ return r.grupo === 'sinal' && r.valor > 0; });
+  var defs = [];
+  function add(key, title, make){ defs.push({key:key, title:title, make:make}); }
+  var cidUf = im.cidade + '/' + im.uf;
+
+  add('objeto','DO OBJETO E DAS DEFINIÇÕES', function(n){
+    var ps = [];
+    ps.push('Pela presente proposta, o PROPONENTE — o comprador qualificado na Seção I e, quando houver, o cônjuge ou segundo comprador qualificado na Seção II, que respondem solidariamente pelas obrigações aqui assumidas — oferece-se para adquirir do VENDEDOR, qualificado nesta proposta, o imóvel descrito na seção própria, pelo preço e nas condições do Quadro de Condições Comerciais, com a intermediação da IMOBILIÁRIA ' + C.nome + ', inscrita no CNPJ sob o nº ' + C.cnpj + '.');
+    ps.push(im.visitou
+      ? 'O PROPONENTE declara ter visitado e conferido o imóvel, que aceita no estado de conservação em que se encontra, ressalvado o que constar das Condições Especiais.'
+      : 'O PROPONENTE formula esta proposta com base nas informações constantes deste instrumento e nas prestadas pela IMOBILIÁRIA, ressalvado o que constar das Condições Especiais.');
+    if (im.incluso) ps.push('Incluem-se na negociação os seguintes bens e utilidades: ' + im.incluso + '.');
+    return ps;
+  });
+
+  add('validade','DA VALIDADE DA PROPOSTA', function(n){
+    return [
+      'Esta proposta é válida até ' + fmtDate(pg.validade) + '. Durante esse prazo obriga o PROPONENTE, nos termos dos arts. 427 e 428 do Código Civil, não podendo ser retirada nem alterada unilateralmente.',
+      'Decorrido o prazo sem a aceitação do VENDEDOR, a proposta perde a eficácia, nada sendo devido pelo PROPONENTE à IMOBILIÁRIA ou ao corretor, e quaisquer valores que tenham sido entregues serão restituídos integralmente, sem retenção ou desconto.',
+      'Eventual contraproposta do VENDEDOR somente produzirá efeitos mediante nova aceitação escrita do PROPONENTE.'
+    ];
+  });
+
+  add('aceite','DA ACEITAÇÃO E DA FORMALIZAÇÃO', function(n){
+    var prazo = pg.prazoForm ? 'no prazo de ' + pg.prazoForm + ' (' + extensoInt(parseInt(pg.prazoForm,10)) + ') dias úteis contados da aceitação' : 'no prazo a ser ajustado entre as partes';
+    return [
+      'Esta proposta somente será considerada aceita após a aprovação expressa do VENDEDOR, manifestada pela assinatura no campo de aceite deste instrumento. Com a aceitação, a negociação torna-se irretratável para ambas as partes, nos termos aqui previstos.',
+      'Aceita a proposta, será ela substituída pelo instrumento definitivo da negociação (compromisso de compra e venda, escritura pública ou contrato de financiamento com força de escritura pública, conforme a forma exigida em lei e a modalidade de pagamento), que constituirá o único instrumento legal entre o PROPONENTE e o VENDEDOR e será celebrado ' + prazo + '.'
+    ];
+  });
+
+  add('preco','DO PREÇO E DA FORMA DE PAGAMENTO', function(n){
+    var ps = [
+      'O PROPONENTE oferece o preço total de R$ ' + fmtBRL(pg.total) + ' (' + valorExtenso(pg.total) + '), a ser pago na forma do Quadro de Condições Comerciais.',
+      pg.indice
+        ? 'As parcelas vincendas serão corrigidas mensalmente pelo índice indicado no Quadro de Condições Comerciais (' + pg.indice + ').'
+        : 'Não há previsão de correção monetária das parcelas, salvo ajuste diverso no instrumento definitivo.'
+    ];
+    if (pg.fgts) ps.push('A utilização de recursos do FGTS, indicada nesta proposta, sujeita-se às condições e à aprovação previstas na legislação e nas normas do agente operador, correndo por conta do PROPONENTE a comprovação dos requisitos de elegibilidade.');
+    return ps;
+  });
+
+  if (sinalRows.length) add('sinal','DO SINAL E DA FORMA DE RECEBIMENTO', function(n){
+    var ps = [];
+    if (pg.sinalNatureza === 'arras') {
+      ps.push('O valor pago a título de sinal constitui arras confirmatórias, nos termos dos arts. 417 a 419 do Código Civil: em caso de execução do contrato, será computado no preço; se a parte que o deu não executar o contrato, a outra poderá tê-lo por desfeito, retendo-o; se a inexecução for de quem o recebeu, a outra poderá haver o contrato por desfeito e exigir a devolução do valor acrescido do equivalente, com atualização monetária, juros e honorários de advogado, ressalvada a possibilidade de indenização suplementar prevista em lei.');
+    } else {
+      ps.push('O valor pago a título de sinal ou entrada constitui exclusivamente princípio de pagamento do preço, sendo computado como parte dele, sem natureza de arras e sem direito de arrependimento.');
+    }
+    ps.push('O sinal e os demais valores somente poderão ser pagos por PIX, transferência bancária ou cheque cruzado e nominal, em favor da conta indicada pela IMOBILIÁRIA ou pelo VENDEDOR, mediante recibo. Não serão recebidos valores em espécie, e qualquer outra forma de pagamento dependerá de autorização expressa e escrita da administração da IMOBILIÁRIA.');
+    return ps;
+  });
+
+  if (pg.fin) add('financiamento','DO FINANCIAMENTO', function(n){
+    var prazoFin = pg.finPrazo ? 'no prazo de ' + pg.finPrazo + ' (' + extensoInt(parseInt(pg.finPrazo,10)) + ') dias contados da aceitação desta proposta' : 'com diligência e dentro do prazo compatível com a negociação';
+    var valor = pg.finValor > 0 ? 'no valor de R$ ' + fmtBRL(pg.finValor) + ' (' + valorExtenso(pg.finValor) + ')' : 'conforme indicado no Quadro de Condições Comerciais';
+    return [
+      'Parte do preço, ' + valor + ', será paga com recursos de financiamento imobiliário' + (pg.banco ? ' junto a ' + pg.banco : '') + ', ficando a eficácia da negociação condicionada à aprovação do crédito e à avaliação do imóvel.',
+      'O PROPONENTE obriga-se a requerer o financiamento, apresentar a documentação exigida e atender às exigências da instituição financeira que lhe digam respeito ' + prazoFin + '.',
+      'Não obtido o financiamento por motivo não imputável ao PROPONENTE — inclusive negativa de crédito fundada em política da instituição financeira, avaliação do imóvel inferior ao preço, ou recusa do imóvel ou da documentação do VENDEDOR —, a negociação ficará desfeita sem multa ou penalidade ao PROPONENTE, restituindo-se os valores por ele pagos, sem retenção ou desconto.',
+      'A assinatura desta proposta não vincula a instituição financeira, que somente liberará o crédito efetivamente aprovado e contratado.'
+    ];
+  });
+
+  add('despesas','DAS DESPESAS E DOS TRIBUTOS', function(n){
+    return [
+      'Salvo disposição diversa nas Condições Especiais ou no instrumento definitivo, correrão por conta do PROPONENTE o imposto de transmissão (ITBI), os emolumentos, as custas de escritura e de registro e as tarifas do financiamento, quando houver.',
+      'Correrão por conta do VENDEDOR os débitos do imóvel anteriores à entrega da posse (IPTU, taxas, condomínio e consumo), as despesas necessárias à regularização de sua titularidade e eventual imposto sobre ganho de capital.'
+    ];
+  });
+
+  add('documentos','DA DOCUMENTAÇÃO E DA REGULARIDADE DO IMÓVEL', function(n){
+    return [
+      'A negociação fica condicionada à comprovação, pelo VENDEDOR, de sua titularidade e da regularidade do imóvel, mediante certidão atualizada da matrícula com negativa de ônus e de ações reais e pessoais reipersecutórias, certidões negativas de débitos fiscais e condominiais e certidões dos distribuidores relativas ao VENDEDOR, além dos demais documentos exigidos pela instituição financeira ou pelo Oficial de Registro de Imóveis.',
+      'Sendo o VENDEDOR casado ou vivendo em união estável, o cônjuge ou companheiro deverá comparecer ao ato e anuir à venda, nos termos do art. 1.647, inciso I, do Código Civil, salvo no regime de separação absoluta de bens.',
+      'O PROPONENTE autoriza a IMOBILIÁRIA a conferir seus dados cadastrais e documentos, bem como os do cônjuge ou segundo comprador, para fins de análise e formalização da negociação.'
+    ];
+  });
+
+  add('vendedor','DAS DECLARAÇÕES E DO ACEITE DO VENDEDOR', function(n){
+    return [
+      'Ao assinar o campo de aceite, o VENDEDOR declara ser o legítimo proprietário do imóvel, ter poderes para aliená-lo, estar de acordo com o preço e com as condições desta proposta e que as informações por ele prestadas à IMOBILIÁRIA são verdadeiras.',
+      'A remuneração de corretagem devida pelo VENDEDOR é a ajustada com a IMOBILIÁRIA em instrumento próprio, não sendo alterada por esta proposta.'
+    ];
+  });
+
+  if (pg.comissaoOn) add('corretagem','DA CORRETAGEM EM CASO DE DESISTÊNCIA', function(n){
+    var ps = [
+      'Caso o PROPONENTE venha a desistir ou a se arrepender da negociação após a aceitação desta proposta pelo VENDEDOR, obriga-se a pagar à IMOBILIÁRIA e ao corretor, em remuneração pelos serviços de intermediação prestados, o equivalente a ' + String(pg.comissao).replace('.', ',') + '% do valor total desta proposta (R$ ' + fmtBRL(pg.total * parseFloat(String(pg.comissao).replace(',', '.')) / 100) + ' sobre o preço ora proposto), nos termos dos arts. 722 e 725 do Código Civil.',
+      'Se a proposta não for aceita pelo VENDEDOR, nada será devido pelo PROPONENTE à IMOBILIÁRIA ou ao corretor.'
+    ];
+    if (pg.fin) ps.push('Não caracteriza desistência a desistência prevista na cláusula do financiamento, decorrente de motivo não imputável ao PROPONENTE.');
+    return ps;
+  });
+
+  add('declaracoes','DAS DECLARAÇÕES DO PROPONENTE', function(n){
+    return [
+      'O PROPONENTE declara que as informações e os documentos por ele prestados são verdadeiros, respondendo civil e criminalmente por eles, e que os recursos empregados na negociação têm origem lícita, estando ciente das obrigações de identificação de clientes previstas na legislação de prevenção à lavagem de dinheiro (Lei nº 9.613/1998).',
+      'O PROPONENTE reconhece que a IMOBILIÁRIA atua como intermediária da negociação, sem garantir a aprovação de financiamento nem a aceitação desta proposta pelo VENDEDOR, e declara ter lido e concordado com todos os termos deste instrumento.'
+    ];
+  });
+
+  add('lgpd','DA PROTEÇÃO DE DADOS PESSOAIS', function(n){
+    return [
+      'Os dados pessoais das partes serão tratados pela IMOBILIÁRIA exclusivamente para análise, negociação e formalização do negócio, cumprimento de obrigações legais e regulatórias e exercício regular de direitos, nos termos da Lei nº 13.709/2018, podendo ser compartilhados, na medida do necessário, com o VENDEDOR, instituições financeiras, cartórios e profissionais envolvidos na operação.' + (C.email ? ' Os titulares poderão exercer seus direitos pelo e-mail ' + C.email + '.' : '')
+    ];
+  });
+
+  add('assinatura','DAS COMUNICAÇÕES E DA ASSINATURA', function(n){
+    return [
+      'As comunicações entre as partes serão feitas por escrito, nos endereços e e-mails indicados nesta proposta, cabendo a cada parte informar prontamente a alteração de seus dados.',
+      'Esta proposta poderá ser assinada em meio físico ou eletrônico, reconhecendo as partes a validade das assinaturas eletrônicas, nos termos da Medida Provisória nº 2.200-2/2001 e da Lei nº 14.063/2020.'
+    ];
+  });
+
+  if (pg.especiais) add('especiais','DAS CONDIÇÕES ESPECIAIS', function(n){
+    var ps = pg.especiais.split(/\n+/).map(function(s){ return s.trim(); }).filter(Boolean);
+    ps.push('Em caso de conflito entre as Condições Especiais e as demais cláusulas, prevalecem as Condições Especiais.');
+    return ps;
+  });
+
+  add('foro','DO FORO', function(n){
+    return ['Fica eleito o foro da Comarca de ' + cidUf + ', local da situação do imóvel, para dirimir questões decorrentes desta proposta, ressalvada a competência do foro do domicílio do consumidor quando a relação for de consumo (Lei nº 8.078/1990).'];
+  });
+
+  var nums = {};
+  defs.forEach(function(x, i){ nums[x.key] = i + 1; });
+  return defs.map(function(x, i){
+    var ps = x.make(nums);
+    return {num: i + 1, title: x.title, paras: ps};
+  });
+}
+
+/* ---- PDF ---- */
+function buildPdf(d, J){
+  var doc = new J({unit:'mm', format:'a4', compress:true});
+  var W = 210, H = 297, ML = 22, MR = 18, MT = 33, MB = 22, CW = W - ML - MR;
+  var NAVY = [27,42,74], GREY = [98,106,122], LINE = [200,205,214], FILL = [239,241,246], INK = [28,30,36];
+  var C = d.cfg, y = MT;
+  var secN = 0;
+
+  doc.setProperties({title:'Proposta de Compra de Imóvel - ' + d.p.nome, author:C.nome, subject:'Proposta de compra de imóvel', creator:C.nome});
+
+  function setF(style, size, color){
+    doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK);
+  }
+  function wrap(text, w, style, size){ setF(style, size); return doc.splitTextToSize(String(text), w); }
+  function need(h){ if (y + h > H - MB) { doc.addPage(); y = MT; } }
+
+  function section(title){
+    secN++;
+    need(16);
+    doc.setFillColor.apply(doc, FILL); doc.rect(ML, y, CW, 6.6, 'F');
+    doc.setFillColor.apply(doc, NAVY); doc.rect(ML, y, 1.3, 6.6, 'F');
+    setF('bold', 9.2, NAVY);
+    doc.text(romano(secN) + ' — ' + title.toUpperCase(), ML + 4, y + 4.5);
+    y += 9.6;
+  }
+
+  function grid(rows){
+    rows.forEach(function(cells){
+      var cs = cells.filter(function(c){ return c; });
+      var gap = 3, avail = CW - gap * (cs.length - 1), maxL = 1;
+      var prep = cs.map(function(c){
+        var w = avail * c.w;
+        var txt = (c.v !== undefined && c.v !== null && String(c.v).trim()) ? String(c.v) : '—';
+        var ls = wrap(txt, w, 'normal', 9.4);
+        maxL = Math.max(maxL, ls.length);
+        return {c:c, w:w, ls:ls, empty: txt === '—'};
+      });
+      var h = 6.9 + (maxL - 1) * 4.05 + 2.2;
+      need(h);
+      var x = ML;
+      prep.forEach(function(p){
+        setF('normal', 6.6, GREY);
+        doc.text(p.c.l.toUpperCase(), x, y + 2.6);
+        setF('normal', 9.4, p.empty ? GREY : INK);
+        p.ls.forEach(function(t, i){ doc.text(t, x, y + 6.7 + i * 4.05); });
+        doc.setDrawColor.apply(doc, LINE); doc.setLineWidth(0.15);
+        doc.line(x, y + h - 0.7, x + p.w, y + h - 0.7);
+        x += p.w + gap;
+      });
+      y += h;
+    });
+    y += 3.5;
+  }
+
+  function para(text, o){
+    o = o || {};
+    var size = o.size || 9.1, style = o.style || 'normal', indent = o.indent || 0, after = o.after === undefined ? 1.8 : o.after;
+    var w = CW - indent, lh = size * 0.3528 * 1.42;
+    var ls = wrap(text, w, style, size);
+    ls.forEach(function(t, i){
+      need(lh + 0.5);
+      setF(style, size, o.color);
+      var last = i === ls.length - 1;
+      if (o.justify !== false && !last && t.indexOf(' ') > -1) doc.text(t, ML + indent, y + 3.2, {align:'justify', maxWidth:w});
+      else doc.text(t, ML + indent, y + 3.2);
+      y += lh;
+    });
+    y += after;
+  }
+
+  function clauseHeading(n, title){
+    need(18);
+    setF('bold', 9.2, NAVY);
+    doc.text('CLÁUSULA ' + n + 'ª — ' + title, ML, y + 3.2);
+    y += 6.2;
+  }
+
+  /* -- título -- */
+  setF('bold', 16, NAVY);
+  doc.text('PROPOSTA DE COMPRA DE IMÓVEL', ML, y + 5);
+  y += 9;
+  setF('normal', 9, GREY);
+  doc.text('Proposta nº ' + d.ref + '  ·  ' + d.local + ', ' + dataExtenso(d.data), ML, y + 3);
+  y += 8;
+  para('O PROPONENTE abaixo qualificado apresenta, por intermédio da ' + C.nome + ', a presente PROPOSTA DE COMPRA do imóvel descrito neste instrumento, nos termos e condições a seguir.', {after: 4});
+
+  /* -- I proponente -- */
+  var p = d.p;
+  section('Proponente comprador');
+  grid([
+    [{l:'Nome completo', v:p.nome, w:.62}, {l:'Estado civil', v:p.estcivil, w:.38}],
+    [{l:'Nacionalidade', v:p.nac, w:.3}, {l:'Data de nascimento', v:fmtDate(p.nasc), w:.3}, {l:'Naturalidade', v:p.nat, w:.4}],
+    [{l:'Documento de identidade (RG)', v:p.rg, w:.34}, {l:'Órgão expedidor', v:p.orgao, w:.26}, {l:'CPF', v:p.cpf, w:.4}],
+    [{l:'Profissão', v:p.prof, w:.4}, {l:'Local de trabalho', v:p.trabalho, w:.6}],
+    [{l:'Endereço residencial', v:p.endres, w:1}],
+    [{l:'Cidade/UF', v:p.cidade, w:.45}, {l:'CEP', v:p.cep, w:.2}, {l:'Telefone', v:p.fone, w:.35}],
+    [{l:'Endereço de trabalho', v:p.endtrab, w:.6}, {l:'Cidade', v:p.cidtrab, w:.4}],
+    [{l:'E-mail', v:p.email, w:1}]
+  ]);
+
+  /* -- II cônjuge -- */
+  if (d.c) {
+    var c = d.c;
+    section('Cônjuge, companheiro(a) ou segundo comprador');
+    grid([
+      [{l:'Nome completo', v:c.nome, w:.62}, {l:'Nacionalidade', v:c.nac, w:.38}],
+      [{l:'Documento de identidade (RG)', v:c.rg, w:.34}, {l:'Órgão expedidor', v:c.orgao, w:.26}, {l:'CPF', v:c.cpf, w:.4}],
+      [{l:'Data de nascimento', v:fmtDate(c.nasc), w:.3}, {l:'Naturalidade', v:c.nat, w:.3}, {l:'Profissão', v:c.prof, w:.4}],
+      [{l:'Regime de bens / vínculo', v:c.regime, w:1}],
+      [{l:'Endereço', v:c.end, w:.62}, {l:'Telefone', v:c.fone, w:.38}],
+      [{l:'E-mail', v:c.email, w:1}]
+    ]);
+  }
+
+  /* -- III vendedor -- */
+  var v = d.v;
+  section('Vendedor (proprietário do imóvel)');
+  grid([
+    [{l:'Nome completo / razão social', v:v.nome, w:.62}, {l:'CPF / CNPJ', v:v.doc, w:.38}],
+    [{l:'Estado civil', v:v.estcivil, w:.3}, {l:'Profissão', v:v.prof, w:.7}],
+    [{l:'Endereço', v:v.end, w:1}],
+    [{l:'Telefone / e-mail', v:v.contato, w:1}]
+  ].concat(v.conj ? [[{l:'Cônjuge ou companheiro(a) do vendedor', v:v.conj.nome, w:.62}, {l:'CPF', v:v.conj.doc, w:.38}]] : []));
+
+  /* -- IV imóvel -- */
+  var im = d.im;
+  section('Imóvel objeto da proposta');
+  grid([
+    [{l:'Tipo', v:im.tipo, w:.35}, {l:'Situação', v:im.sit, w:.35}, {l:'Código interno', v:im.codigo, w:.3}],
+    [{l:'Endereço completo', v:im.end, w:1}],
+    [{l:'Cidade', v:im.cidade, w:.5}, {l:'UF', v:im.uf, w:.15}, {l:'Condomínio / empreendimento', v:im.cond, w:.35}],
+    [{l:'Descrição', v:im.desc, w:1}],
+    [{l:'Matrícula nº / Cartório de Registro de Imóveis', v:im.matricula, w:.6}, {l:'Inscrição municipal', v:im.inscr, w:.4}]
+  ]);
+
+  /* -- V quadro comercial -- */
+  var pg = d.pg;
+  section('Quadro de condições comerciais');
+  grid([[{l:'Valor total da proposta', v:'R$ ' + fmtBRL(pg.total) + ' (' + valorExtenso(pg.total) + ')', w:1}]]);
+
+  var cols = [ML, ML + 86, ML + 118], rEnd = ML + CW;
+  function tHead(){
+    need(14);
+    doc.setFillColor.apply(doc, NAVY); doc.rect(ML, y, CW, 6, 'F');
+    setF('bold', 8, [255,255,255]);
+    doc.text('DESCRIÇÃO', cols[0] + 2, y + 4.1);
+    doc.text('VENCIMENTO', cols[1] + 2, y + 4.1);
+    doc.text('VALOR (R$)', rEnd - 2, y + 4.1, {align:'right'});
+    y += 6;
+  }
+  function tGroup(label){
+    need(14);
+    doc.setFillColor.apply(doc, FILL); doc.rect(ML, y, CW, 5.4, 'F');
+    setF('bold', 7.8, NAVY); doc.text(label.toUpperCase(), cols[0] + 2, y + 3.8);
+    y += 5.4;
+  }
+  function tRow(r){
+    var ls = wrap(r.desc || '—', 82, 'normal', 9);
+    var h = Math.max(6, ls.length * 4.1 + 2.2);
+    need(h);
+    setF('normal', 9);
+    ls.forEach(function(t, i){ doc.text(t, cols[0] + 2, y + 4.3 + i * 4.1); });
+    doc.text(r.venc || '—', cols[1] + 2, y + 4.3);
+    doc.text(fmtBRL(r.valor), rEnd - 2, y + 4.3, {align:'right'});
+    doc.setDrawColor.apply(doc, LINE); doc.setLineWidth(0.15); doc.line(ML, y + h, rEnd, y + h);
+    y += h;
+  }
+  function tSub(label, val){
+    need(7);
+    setF('bold', 8.6, INK);
+    doc.text(label, rEnd - 40, y + 4.4, {align:'right'});
+    doc.text(fmtBRL(val), rEnd - 2, y + 4.4, {align:'right'});
+    y += 6.2;
+  }
+  tHead();
+  var gs = pg.pagamentos.filter(function(r){ return r.grupo === 'sinal'; });
+  var gr = pg.pagamentos.filter(function(r){ return r.grupo !== 'sinal'; });
+  var sum = function(a){ return a.reduce(function(s, r){ return s + r.valor; }, 0); };
+  if (gs.length) { tGroup('Sinal / entrada'); gs.forEach(tRow); tSub('Subtotal sinal / entrada', sum(gs)); }
+  if (gr.length) { tGroup('Saldo restante'); gr.forEach(tRow); tSub('Subtotal saldo', sum(gr)); }
+  need(10);
+  doc.setFillColor.apply(doc, FILL); doc.rect(ML, y, CW, 7, 'F');
+  setF('bold', 9.2, NAVY);
+  doc.text('TOTAL GERAL DO NEGÓCIO', cols[0] + 2, y + 4.8);
+  doc.text('R$ ' + fmtBRL(sum(pg.pagamentos)), rEnd - 2, y + 4.8, {align:'right'});
+  y += 11;
+
+  var recursos = [];
+  if (pg.fin) recursos.push('Financiamento bancário' + (pg.finValor > 0 ? ' (R$ ' + fmtBRL(pg.finValor) + ')' : '') + (pg.banco ? ' — ' + pg.banco : ''));
+  if (pg.fgts) recursos.push('FGTS');
+  grid([
+    [{l:'Recursos envolvidos', v:recursos.join('; ') || 'Recursos próprios', w:.6}, {l:'Índice de correção das parcelas', v:pg.indice || 'Sem correção', w:.4}],
+    [{l:'Natureza do sinal', v:pg.sinalNatureza === 'arras' ? 'Arras confirmatórias (arts. 417 a 419 do Código Civil)' : 'Princípio de pagamento do preço', w:.6}, {l:'Proposta válida até', v:fmtDate(pg.validade), w:.4}]
+  ]);
+
+  /* -- VI condições gerais -- */
+  section('Condições gerais');
+  buildClauses(d).forEach(function(cl){
+    clauseHeading(cl.num, cl.title);
+    cl.paras.forEach(function(t, i){
+      var pre = cl.paras.length > 1 ? cl.num + '.' + (i + 1) + '  ' : '';
+      para(pre + t, {after: 1.6});
+    });
+    y += 1.6;
+  });
+
+  /* -- VII assinaturas -- */
+  need(24);
+  y += 2;
+  section('Assinaturas');
+  para('E, por estarem de acordo, firmam esta proposta em ' + d.local + ', em ' + dataExtenso(d.data) + ', em duas vias de igual teor ou em formato eletrônico.', {after: 4});
+
+  function sigPair(a, b){
+    var gap = 10, w = (CW - gap) / 2;
+    var blocks = [a, b].filter(function(x){ return x; });
+    var hs = blocks.map(function(bl){
+      var h = 12;
+      bl.lines.forEach(function(t){ h += wrap(t, w, 'normal', 8).length * 3.6; });
+      return h + wrap(bl.name, w, 'bold', 9).length * 4;
+    });
+    var H2 = Math.max.apply(null, hs);
+    need(H2 + 4);
+    blocks.forEach(function(bl, i){
+      var x = ML + i * (w + gap), top = y + 12;
+      doc.setDrawColor.apply(doc, INK); doc.setLineWidth(0.25); doc.line(x, top, x + w, top);
+      setF('bold', 7, NAVY); doc.text(bl.role.toUpperCase(), x, y + 3);
+      var yy = top + 4;
+      setF('bold', 9); wrap(bl.name, w, 'bold', 9).forEach(function(t){ doc.text(t, x, yy); yy += 4; });
+      setF('normal', 8, GREY);
+      bl.lines.forEach(function(t){ wrap(t, w, 'normal', 8).forEach(function(tt){ doc.text(tt, x, yy); yy += 3.6; }); });
+    });
+    y += H2 + 5;
+  }
+
+  sigPair(
+    {role:'Proponente comprador', name:p.nome, lines:['CPF ' + p.cpf]},
+    d.c ? {role:'Cônjuge / segundo comprador', name:d.c.nome, lines:['CPF ' + d.c.cpf]} : null
+  );
+
+  need(30);
+  var boxTop = y;
+  setF('bold', 8.6, NAVY);
+  doc.text('ACEITE DO VENDEDOR', ML, y + 3.4);
+  y += 6;
+  para('O VENDEDOR, qualificado nesta proposta, declara ter ciência de seu teor, aceita-a integralmente nos termos e condições acima, tornando-a irretratável, e confirma as declarações a ele atribuídas, em ____ / ____ / ________.', {after: 3});
+  sigPair(
+    {role:'Vendedor (proprietário)', name:v.nome, lines:[(v.doc ? 'CPF/CNPJ ' + v.doc : '')].filter(Boolean)},
+    v.conj ? {role:'Cônjuge / companheiro(a) do vendedor (anuência)', name:v.conj.nome, lines:['CPF ' + v.conj.doc]} : null
+  );
+
+  sigPair(
+    {role:'Corretor(a) responsável pela intermediação', name:d.corretor.nome, lines:[d.corretor.creci, C.nome + ' — CNPJ ' + C.cnpj].filter(Boolean)},
+    null
+  );
+
+  /* -- cabeçalho e rodapé em todas as páginas -- */
+  var total = doc.getNumberOfPages();
+  for (var i = 1; i <= total; i++) {
+    doc.setPage(i);
+    setF('bold', 13, NAVY); doc.text(C.nome, ML, 13);
+    setF('bold', 8.2, NAVY); doc.text('PROPOSTA DE COMPRA', W - MR, 12, {align:'right'});
+    setF('normal', 7.6, GREY); doc.text('Nº ' + d.ref, W - MR, 16, {align:'right'});
+    var l2 = 'CNPJ ' + C.cnpj + (C.resp ? '  ·  Resp.: ' + C.resp + (C.creci ? ' — ' + C.creci : '') : '');
+    doc.text(l2, ML, 17.6);
+    var l3 = [C.end, C.email, C.fone].filter(Boolean).join('  ·  ');
+    doc.text(doc.splitTextToSize(l3, CW - 30)[0], ML, 21.4);
+    doc.setDrawColor.apply(doc, NAVY); doc.setLineWidth(0.5); doc.line(ML, 25, W - MR, 25);
+    doc.setDrawColor.apply(doc, LINE); doc.setLineWidth(0.2); doc.line(ML, H - 16, W - MR, H - 16);
+    setF('normal', 7.4, GREY);
+    doc.text(doc.splitTextToSize('Proposta de Compra nº ' + d.ref + '  ·  Proponente: ' + d.p.nome, CW - 30)[0], ML, H - 11.8);
+    doc.text('Página ' + i + ' de ' + total, W - MR, H - 11.8, {align:'right'});
+  }
+  return doc;
+}
+
+
+</script>
+<script>
+/* ===== UI: formulário, validação e geração ===== */
+var $ = function(id){ return document.getElementById(id); };
+var UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+var ESTCIVIL = ['Solteiro(a)','Casado(a)','União estável','Divorciado(a)','Separado(a) judicialmente','Viúvo(a)'];
+var REGIMES = ['Comunhão parcial de bens','Comunhão universal de bens','Separação total de bens','Participação final nos aquestos','União estável','Segundo comprador (sem vínculo conjugal)'];
+var TIPOS = ['Apartamento','Casa','Casa em condomínio','Terreno / lote','Sala / loja comercial','Galpão','Imóvel rural','Outro'];
+var SITUACOES = ['Pronto / usado','Na planta / em construção'];
+
+/* campo: {id,label,span,type,opts,req,mask,ph,val,hint} */
+function fieldHTML(f){
+  var span = f.span || 6, h = '<div class="f s' + span + '" id="w_' + f.id + '"><label for="' + f.id + '">' + f.label + (f.req ? ' <b class="rq" title="obrigatório">*</b>' : '') + '</label>';
+  var ph = f.ph ? ' placeholder="' + f.ph + '"' : '';
+  var val = f.val !== undefined ? f.val : '';
+  if (f.type === 'select') {
+    h += '<select id="' + f.id + '">' + (f.noblank ? '' : '<option value="">Selecione</option>') + f.opts.map(function(o){
+      var v = typeof o === 'string' ? o : o[0], t = typeof o === 'string' ? o : o[1];
+      return '<option value="' + v + '"' + (v === val ? ' selected' : '') + '>' + t + '</option>';
+    }).join('') + '</select>';
+  } else if (f.type === 'textarea') {
+    h += '<textarea id="' + f.id + '" rows="' + (f.rows || 3) + '"' + ph + '>' + val + '</textarea>';
+  } else {
+    h += '<input id="' + f.id + '" type="' + (f.type || 'text') + '"' + ph + ' value="' + String(val).replace(/"/g,'&quot;') + '"' + (f.mask === 'money' ? ' inputmode="decimal"' : '') + (f.mask === 'fone' || f.mask === 'cep' || f.mask === 'cpf' ? ' inputmode="numeric"' : '') + ' autocomplete="off">';
+  }
+  if (f.hint) h += '<small>' + f.hint + '</small>';
+  h += '<span class="err" id="e_' + f.id + '"></span></div>';
+  return h;
+}
+function renderFields(target, fields){ $(target).innerHTML = fields.map(fieldHTML).join(''); }
+
+var today = new Date();
+var iso = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+var refDefault = 'PC-' + iso.replace(/-/g,'') + '-' + String(today.getHours()).padStart(2,'0') + String(today.getMinutes()).padStart(2,'0');
+
+var F = {};
+F.cfg = [
+  {id:'cfg_nome', label:'Nome da imobiliária', span:6, val:'Adm House', req:1},
+  {id:'cfg_cnpj', label:'CNPJ', span:6, val:'14.904.612/0001-13', req:1, mask:'cnpj'},
+  {id:'cfg_resp', label:'Corretora responsável', span:6, val:'Jana Alves da Cruz'},
+  {id:'cfg_creci', label:'CRECI', span:6, val:'CRECI/SP 265893-F'},
+  {id:'cfg_end', label:'Endereço do escritório', span:12, val:'R. dos Andradas, 263, Centro — Itu/SP — CEP 13.300-170'},
+  {id:'cfg_email', label:'E-mail', span:6, val:'janaalvesdacruzjc@gmail.com'},
+  {id:'cfg_fone', label:'Telefone', span:6, mask:'fone', ph:'(00) 00000-0000'}
+];
+F.meta = [
+  {id:'m_ref', label:'Nº da proposta', span:4, val:refDefault, req:1},
+  {id:'m_local', label:'Local', span:4, val:'Itu/SP', req:1},
+  {id:'m_data', label:'Data da proposta', span:4, type:'date', val:iso, req:1}
+];
+F.p = [
+  {id:'p_nome', label:'Nome completo', span:8, req:1},
+  {id:'p_estcivil', label:'Estado civil', span:4, type:'select', opts:ESTCIVIL, req:1},
+  {id:'p_nac', label:'Nacionalidade', span:4, val:'Brasileiro(a)', req:1},
+  {id:'p_nasc', label:'Data de nascimento', span:4, type:'date'},
+  {id:'p_nat', label:'Naturalidade', span:4},
+  {id:'p_rg', label:'RG / Carteira de identidade', span:4, req:1},
+  {id:'p_orgao', label:'Órgão expedidor', span:3, ph:'SSP/SP'},
+  {id:'p_cpf', label:'CPF', span:5, mask:'cpf', req:1, ph:'000.000.000-00'},
+  {id:'p_prof', label:'Profissão', span:6, req:1},
+  {id:'p_trabalho', label:'Local de trabalho', span:6},
+  {id:'p_endres', label:'Endereço residencial', span:12, req:1, ph:'Rua, número, complemento, bairro'},
+  {id:'p_cidade', label:'Cidade/UF', span:5, req:1},
+  {id:'p_cep', label:'CEP', span:3, mask:'cep'},
+  {id:'p_fone', label:'Telefone', span:4, mask:'fone', req:1, ph:'(00) 00000-0000'},
+  {id:'p_endtrab', label:'Endereço de trabalho', span:8},
+  {id:'p_cidtrab', label:'Cidade', span:4},
+  {id:'p_email', label:'E-mail', span:12, type:'email'}
+];
+F.c = [
+  {id:'c_nome', label:'Nome completo', span:8, req:1},
+  {id:'c_nac', label:'Nacionalidade', span:4, val:'Brasileiro(a)'},
+  {id:'c_rg', label:'RG', span:4},
+  {id:'c_orgao', label:'Órgão expedidor', span:3},
+  {id:'c_cpf', label:'CPF', span:5, mask:'cpf', req:1},
+  {id:'c_nasc', label:'Data de nascimento', span:4, type:'date'},
+  {id:'c_nat', label:'Naturalidade', span:4},
+  {id:'c_prof', label:'Profissão', span:4},
+  {id:'c_regime', label:'Regime de bens / vínculo', span:12, type:'select', opts:REGIMES},
+  {id:'c_end', label:'Endereço', span:8, ph:'Se o mesmo do proponente, repita'},
+  {id:'c_fone', label:'Telefone', span:4, mask:'fone'},
+  {id:'c_email', label:'E-mail', span:12, type:'email'}
+];
+F.v = [
+  {id:'v_nome', label:'Nome completo / razão social', span:8, req:1},
+  {id:'v_doc', label:'CPF / CNPJ', span:4, mask:'doc', req:1},
+  {id:'v_estcivil', label:'Estado civil', span:4, type:'select', opts:ESTCIVIL},
+  {id:'v_prof', label:'Profissão', span:8},
+  {id:'v_end', label:'Endereço', span:12},
+  {id:'v_contato', label:'Telefone / e-mail', span:12}
+];
+F.vc = [
+  {id:'vc_nome', label:'Nome do cônjuge / companheiro(a)', span:8, req:1},
+  {id:'vc_doc', label:'CPF', span:4, mask:'cpf', req:1}
+];
+F.im = [
+  {id:'im_tipo', label:'Tipo do imóvel', span:4, type:'select', opts:TIPOS, req:1},
+  {id:'im_sit', label:'Situação', span:4, type:'select', opts:SITUACOES, req:1, noblank:1, val:'Pronto / usado'},
+  {id:'im_codigo', label:'Código interno', span:4},
+  {id:'im_end', label:'Endereço completo', span:12, req:1, ph:'Rua, número, bloco, apartamento, bairro'},
+  {id:'im_cidade', label:'Cidade', span:6, req:1},
+  {id:'im_uf', label:'UF', span:2, type:'select', opts:UFS, req:1},
+  {id:'im_cond', label:'Condomínio / empreendimento', span:4},
+  {id:'im_desc', label:'Descrição do imóvel', span:12, type:'textarea', req:1, ph:'Dormitórios, vagas de garagem, áreas, características relevantes'},
+  {id:'im_matricula', label:'Matrícula nº e Cartório de Registro de Imóveis', span:8},
+  {id:'im_inscr', label:'Inscrição municipal', span:4},
+  {id:'im_incluso', label:'Bens e utilidades incluídos na venda', span:12, ph:'Ex.: armários planejados, ar-condicionado'}
+];
+F.pg = [
+  {id:'pg_total', label:'Valor total da proposta (R$)', span:4, mask:'money', req:1, ph:'0,00'},
+  {id:'pg_validade', label:'Proposta válida até', span:4, type:'date', req:1},
+  {id:'pg_prazoForm', label:'Prazo para formalizar o contrato (dias úteis)', span:4, type:'number', ph:'opcional'},
+  {id:'pg_indice', label:'Índice de correção das parcelas', span:6, ph:'Ex.: IPCA, INCC, IGP-M (vazio = sem correção)'},
+  {id:'pg_sinalNat', label:'Natureza do sinal', span:6, type:'select', noblank:1, opts:[['principio','Princípio de pagamento (parte do preço)'],['arras','Arras confirmatórias (arts. 417 a 419 do Código Civil)']]}
+];
+F.fin = [
+  {id:'pg_finValor', label:'Valor a financiar (R$)', span:4, mask:'money', req:1},
+  {id:'pg_banco', label:'Instituição financeira', span:4, ph:'opcional'},
+  {id:'pg_finPrazo', label:'Prazo para protocolar (dias)', span:4, type:'number', ph:'opcional'}
+];
+F.com = [
+  {id:'pg_comissao', label:'Percentual de corretagem devido em caso de desistência (%)', span:6, req:1, ph:'Ex.: 6', hint:'Informe o percentual combinado com a imobiliária.'}
+];
+F.esp = [
+  {id:'pg_especiais', label:'Condições especiais', span:12, type:'textarea', rows:4, ph:'Uma condição por linha. Ex.: entrega do imóvel livre e desocupado na data da escritura.'}
+];
+F.corr = [
+  {id:'co_nome', label:'Corretor(a) responsável', span:7, req:1, val:'Jana Alves da Cruz'},
+  {id:'co_creci', label:'CRECI do corretor(a)', span:5, val:'CRECI/SP 265893-F'}
+];
+
+renderFields('f_cfg', F.cfg);
+renderFields('f_meta', F.meta);
+renderFields('f_p', F.p);
+renderFields('f_c', F.c);
+renderFields('f_v', F.v);
+renderFields('f_vc', F.vc);
+renderFields('f_im', F.im);
+renderFields('f_pg', F.pg);
+renderFields('f_fin', F.fin);
+renderFields('f_com', F.com);
+renderFields('f_esp', F.esp);
+renderFields('f_corr', F.corr);
+$('pg_comissao').value = '';
+
+/* ---- máscaras ---- */
+document.addEventListener('input', function(e){
+  var t = e.target, id = t.id || '';
+  if (id === 'p_cpf' || id === 'c_cpf' || id === 'vc_doc') t.value = fmtCPF(t.value);
+  else if (id === 'v_doc') t.value = fmtDoc(t.value);
+  else if (id === 'cfg_cnpj') t.value = fmtCNPJ(t.value);
+  else if (/_fone$/.test(id)) t.value = fmtFone(t.value);
+  else if (/_cep$/.test(id)) t.value = fmtCEP(t.value);
+  else if (t.getAttribute('inputmode') === 'decimal' || t.classList.contains('money')) {
+    var dg = t.value.replace(/\D/g,'');
+    t.value = dg ? (parseInt(dg,10)/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+  }
+  if (t.classList && t.classList.contains('bad')) clearErr(t);
+  updateTotals();
+});
+function clearErr(el){ el.classList.remove('bad'); var e = $('e_' + el.id); if (e) e.textContent = ''; }
+
+/* ---- toggles ---- */
+function bindToggle(chk, box){
+  var c = $(chk), b = $(box);
+  function sync(){ b.hidden = !c.checked; }
+  c.addEventListener('change', sync); sync();
+}
+bindToggle('t_conj', 'box_conj');
+bindToggle('t_vconj', 'box_vconj');
+bindToggle('t_fin', 'box_fin');
+bindToggle('t_com', 'box_com');
+
+/* ---- linhas de pagamento ---- */
+var rowSeq = 0;
+function addRow(grupo, desc, venc){
+  rowSeq++;
+  var id = 'r' + rowSeq;
+  var div = document.createElement('div');
+  div.className = 'prow'; div.id = id;
+  div.innerHTML =
+    '<div class="f pg"><label for="' + id + '_g">Grupo</label><select id="' + id + '_g"><option value="sinal"' + (grupo === 'sinal' ? ' selected' : '') + '>Sinal / entrada</option><option value="saldo"' + (grupo === 'saldo' ? ' selected' : '') + '>Saldo restante</option></select></div>' +
+    '<div class="f pd"><label for="' + id + '_d">Descrição</label><input id="' + id + '_d" type="text" value="' + (desc || '') + '" placeholder="Ex.: sinal via PIX, financiamento, parcelas mensais"></div>' +
+    '<div class="f pv"><label for="' + id + '_v">Vencimento</label><input id="' + id + '_v" type="text" value="' + (venc || '') + '" placeholder="dd/mm/aaaa ou na assinatura"></div>' +
+    '<div class="f pm"><label for="' + id + '_m">Valor (R$)</label><input id="' + id + '_m" class="money" type="text" inputmode="decimal" placeholder="0,00"></div>' +
+    '<button type="button" class="ghost rm" aria-label="Remover linha" data-rm="' + id + '">Remover</button>';
+  $('rows').appendChild(div);
+}
+$('rows').addEventListener('click', function(e){
+  var id = e.target.getAttribute && e.target.getAttribute('data-rm');
+  if (id) { var el = $(id); if (el) el.remove(); updateTotals(); }
+});
+$('add_row').addEventListener('click', function(){ addRow('saldo'); });
+addRow('sinal', '', 'Na assinatura');
+addRow('saldo', '', '');
+
+function getRows(){
+  return Array.prototype.slice.call($('rows').children).map(function(r){
+    return {grupo: $(r.id + '_g').value, desc: $(r.id + '_d').value.trim(), venc: $(r.id + '_v').value.trim(), valor: parseMoney($(r.id + '_m').value)};
+  });
+}
+function updateTotals(){
+  var total = parseMoney($('pg_total').value), rows = getRows();
+  var soma = rows.reduce(function(s, r){ return s + r.valor; }, 0);
+  var dif = Math.round((total - soma) * 100) / 100;
+  var box = $('tot');
+  $('tot_total').textContent = 'R$ ' + fmtBRL(total);
+  $('tot_soma').textContent = 'R$ ' + fmtBRL(soma);
+  $('tot_ext').textContent = total > 0 ? valorExtenso(total) : '';
+  if (total > 0 && Math.abs(dif) < 0.005) { box.className = 'tot ok'; $('tot_dif').textContent = 'Confere'; }
+  else { box.className = 'tot warn'; $('tot_dif').textContent = (dif > 0 ? 'Faltam R$ ' : 'Excede em R$ ') + fmtBRL(Math.abs(dif)); }
+}
+
+/* ---- coleta ---- */
+function v(id){ var el = $(id); return el ? el.value.trim() : ''; }
+function collect(){
+  var d = {
+    cfg: {nome:v('cfg_nome'), cnpj:v('cfg_cnpj'), resp:v('cfg_resp'), creci:v('cfg_creci'), end:v('cfg_end'), email:v('cfg_email'), fone:v('cfg_fone')},
+    ref: v('m_ref'), local: v('m_local'), data: v('m_data'),
+    p: {nome:v('p_nome'), nac:v('p_nac'), estcivil:v('p_estcivil'), nasc:v('p_nasc'), nat:v('p_nat'), rg:v('p_rg'), orgao:v('p_orgao'), cpf:v('p_cpf'), prof:v('p_prof'), trabalho:v('p_trabalho'), endres:v('p_endres'), cidade:v('p_cidade'), cep:v('p_cep'), fone:v('p_fone'), endtrab:v('p_endtrab'), cidtrab:v('p_cidtrab'), email:v('p_email')},
+    c: null,
+    v: {nome:v('v_nome'), doc:v('v_doc'), estcivil:v('v_estcivil'), prof:v('v_prof'), end:v('v_end'), contato:v('v_contato'), conj:null},
+    im: {tipo:v('im_tipo'), sit:v('im_sit'), end:v('im_end'), cidade:v('im_cidade'), uf:v('im_uf'), desc:v('im_desc'), matricula:v('im_matricula'), inscr:v('im_inscr'), cond:v('im_cond'), codigo:v('im_codigo'), incluso:v('im_incluso'), visitou:$('t_visitou').checked},
+    pg: {total:parseMoney($('pg_total').value), pagamentos:getRows().filter(function(r){ return r.valor > 0 || r.desc; }), fin:$('t_fin').checked, finValor:parseMoney($('pg_finValor').value), banco:v('pg_banco'), finPrazo:v('pg_finPrazo'), fgts:$('t_fgts').checked, indice:v('pg_indice'), sinalNatureza:v('pg_sinalNat'), validade:v('pg_validade'), prazoForm:v('pg_prazoForm'), comissaoOn:$('t_com').checked, comissao:v('pg_comissao'), especiais:v('pg_especiais')},
+    corretor: {nome:v('co_nome'), creci:v('co_creci')}
+  };
+  if ($('t_conj').checked) d.c = {nome:v('c_nome'), nac:v('c_nac'), rg:v('c_rg'), orgao:v('c_orgao'), nasc:v('c_nasc'), nat:v('c_nat'), cpf:v('c_cpf'), prof:v('c_prof'), regime:v('c_regime'), end:v('c_end'), fone:v('c_fone'), email:v('c_email')};
+  if ($('t_vconj').checked) d.v.conj = {nome:v('vc_nome'), doc:v('vc_doc')};
+  return d;
+}
+
+/* ---- validação ---- */
+function validate(d){
+  var errs = [];
+  function bad(id, msg){ errs.push({id:id, msg:msg}); }
+  function req(id, label){ if (!v(id)) bad(id, label + ' é obrigatório.'); }
+  [['cfg_nome','Nome da imobiliária'],['cfg_cnpj','CNPJ da imobiliária'],['m_ref','Nº da proposta'],['m_local','Local'],['m_data','Data da proposta'],
+   ['p_nome','Nome do proponente'],['p_estcivil','Estado civil do proponente'],['p_nac','Nacionalidade do proponente'],['p_rg','RG do proponente'],['p_prof','Profissão do proponente'],['p_endres','Endereço residencial do proponente'],['p_cidade','Cidade do proponente'],['p_fone','Telefone do proponente'],
+   ['v_nome','Nome do vendedor'],['im_tipo','Tipo do imóvel'],['im_end','Endereço do imóvel'],['im_cidade','Cidade do imóvel'],['im_uf','UF do imóvel'],['im_desc','Descrição do imóvel'],
+   ['pg_total','Valor total da proposta'],['pg_validade','Validade da proposta'],['co_nome','Corretor(a) responsável']].forEach(function(x){ req(x[0], x[1]); });
+  if (v('p_cpf') && !validCPF(v('p_cpf'))) bad('p_cpf', 'CPF do proponente inválido.'); else if (!v('p_cpf')) bad('p_cpf', 'CPF do proponente é obrigatório.');
+  if (!v('v_doc')) bad('v_doc', 'CPF/CNPJ do vendedor é obrigatório.');
+  else { var dv = onlyDigits(v('v_doc')); if (!(dv.length === 11 ? validCPF(dv) : (dv.length === 14 && validCNPJ(dv)))) bad('v_doc', 'CPF/CNPJ do vendedor inválido.'); }
+  if (v('cfg_cnpj') && !validCNPJ(v('cfg_cnpj'))) bad('cfg_cnpj', 'CNPJ da imobiliária inválido.');
+  if (d.c) {
+    req('c_nome', 'Nome do cônjuge/segundo comprador');
+    if (!v('c_cpf')) bad('c_cpf', 'CPF do cônjuge/segundo comprador é obrigatório.'); else if (!validCPF(v('c_cpf'))) bad('c_cpf', 'CPF do cônjuge/segundo comprador inválido.');
+  }
+  if (d.v.conj) {
+    req('vc_nome', 'Nome do cônjuge do vendedor');
+    if (!v('vc_doc')) bad('vc_doc', 'CPF do cônjuge do vendedor é obrigatório.'); else if (!validCPF(v('vc_doc'))) bad('vc_doc', 'CPF do cônjuge do vendedor inválido.');
+  }
+  ['p_email','c_email'].forEach(function(id){ if (v(id) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v(id))) bad(id, 'E-mail inválido.'); });
+  if (d.pg.total <= 0 && v('pg_total')) bad('pg_total', 'Informe um valor maior que zero.');
+  if (v('pg_validade') && v('m_data') && v('pg_validade') < v('m_data')) bad('pg_validade', 'A validade não pode ser anterior à data da proposta.');
+  if (d.pg.fin && !(d.pg.finValor > 0)) bad('pg_finValor', 'Informe o valor a financiar.');
+  if (d.pg.comissaoOn) {
+    var pc = parseFloat(String(d.pg.comissao).replace(',', '.'));
+    if (!(pc > 0 && pc <= 100)) bad('pg_comissao', 'Informe um percentual entre 0 e 100.');
+  }
+  var rows = d.pg.pagamentos;
+  if (!rows.length || !rows.some(function(r){ return r.valor > 0; })) bad('add_row', 'Preencha ao menos uma linha de pagamento com valor.');
+  else {
+    var soma = rows.reduce(function(s, r){ return s + r.valor; }, 0);
+    if (Math.abs(soma - d.pg.total) >= 0.005) bad('add_row', 'A soma das linhas de pagamento (R$ ' + fmtBRL(soma) + ') difere do valor total (R$ ' + fmtBRL(d.pg.total) + ').');
+    rows.forEach(function(r, i){ if (r.valor <= 0) bad('add_row', 'A linha de pagamento ' + (i + 1) + ' está sem valor.'); });
+  }
+  return errs;
+}
+
+/* ---- geração ---- */
+var lastBlob = null, lastName = '';
+function slug(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40); }
+function showMsg(kind, html){ var m = $('msg'); m.className = 'msg ' + kind; m.innerHTML = html; m.hidden = false; m.scrollIntoView({block:'center', behavior:'smooth'}); }
+
+async function saveBlob(blob, name){
+  var dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({filename: name, data: blob}); return {ok:true}; }
+    catch (e) { return {ok:false, reason: (e && e.code) || 'error'}; }
+  }
+  /* fora do Claude (site publicado): download direto pelo navegador */
+  try {
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 1500);
+    return {ok:true};
+  } catch (e) { return {ok:false, reason:'unavailable'}; }
+}
+
+$('btn_gen').addEventListener('click', async function(){
+  document.querySelectorAll('.bad').forEach(clearErr);
+  var d = collect(), errs = validate(d);
+  if (errs.length) {
+    errs.forEach(function(x){ var el = $(x.id); if (el && el.classList) { if (x.id !== 'add_row') el.classList.add('bad'); var e = $('e_' + x.id); if (e) e.textContent = x.msg; } });
+    showMsg('bad', '<strong>Revise ' + errs.length + (errs.length > 1 ? ' pontos' : ' ponto') + ' antes de gerar o PDF:</strong><ul>' + errs.map(function(x){ return '<li><a href="#" data-go="' + x.id + '">' + x.msg + '</a></li>'; }).join('') + '</ul>');
+    return;
+  }
+  var J = window.jspdf && window.jspdf.jsPDF;
+  if (!J) { showMsg('bad', 'A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
+  try {
+    var doc = buildPdf(d, J);
+    lastBlob = doc.output('blob');
+    lastName = 'Proposta_de_Compra_' + slug(d.p.nome) + '_' + d.data.replace(/-/g,'') + '.pdf';
+  } catch (e) { showMsg('bad', 'Não foi possível montar o PDF: ' + (e && e.message ? e.message : e)); return; }
+  var r = await saveBlob(lastBlob, lastName);
+  var resumo = '<div class="sum"><div><span>Proponente</span>' + d.p.nome + '</div><div><span>Imóvel</span>' + d.im.tipo + ' — ' + d.im.cidade + '/' + d.im.uf + '</div><div><span>Valor</span>R$ ' + fmtBRL(d.pg.total) + '</div><div><span>Válida até</span>' + fmtDate(d.pg.validade) + '</div></div>';
+  if (r.ok) showMsg('ok', '<strong>PDF gerado.</strong> Arquivo: ' + lastName + '. Envie ao proponente e ao vendedor para assinatura.' + resumo + '<button type="button" class="ghost" id="btn_again">Baixar novamente</button>');
+  else if (r.reason === 'declined') showMsg('ok', '<strong>PDF pronto.</strong> Você cancelou o salvamento. Use o botão para baixar quando quiser.' + resumo + '<button type="button" class="ghost" id="btn_again">Baixar PDF</button>');
+  else showMsg('bad', 'O PDF foi montado, mas este ambiente não permitiu salvar o arquivo. Abra a página pelo link do artefato no Claude e tente novamente.' + resumo + '<button type="button" class="ghost" id="btn_again">Tentar baixar de novo</button>');
+});
+
+document.addEventListener('click', async function(e){
+  var go = e.target.getAttribute && e.target.getAttribute('data-go');
+  if (go) { e.preventDefault(); var el = $(go); if (el) { el.scrollIntoView({block:'center', behavior:'smooth'}); if (el.focus) el.focus(); } return; }
+  if (e.target.id === 'btn_again' && lastBlob) {
+    var r = await saveBlob(lastBlob, lastName);
+    if (!r.ok && r.reason !== 'declined') showMsg('bad', 'Não foi possível salvar o arquivo neste ambiente.');
+  }
+});
+
+$('btn_clear').addEventListener('click', function(){
+  if (!window.__confirmClear) { window.__confirmClear = true; $('btn_clear').textContent = 'Confirmar limpeza'; setTimeout(function(){ window.__confirmClear = false; $('btn_clear').textContent = 'Limpar formulário'; }, 4000); return; }
+  window.__confirmClear = false; $('btn_clear').textContent = 'Limpar formulário';
+  var limpar = ['pg_total','pg_validade','pg_prazoForm','pg_indice','pg_finValor','pg_banco','pg_finPrazo','pg_comissao','pg_especiais'];
+  document.querySelectorAll('input, textarea, select').forEach(function(el){
+    var id = el.id || '';
+    if (/^(p|c|v|vc|im)_/.test(id) || limpar.indexOf(id) > -1) el.value = '';
+  });
+  $('p_nac').value = 'Brasileiro(a)'; $('c_nac').value = 'Brasileiro(a)';
+  $('im_sit').value = 'Pronto / usado';
+  ['t_conj','t_vconj','t_fin','t_com','t_visitou','t_fgts'].forEach(function(id){ $(id).checked = false; $(id).dispatchEvent(new Event('change')); });
+  $('rows').innerHTML = ''; addRow('sinal', '', 'Na assinatura'); addRow('saldo', '', '');
+  $('m_ref').value = refDefault; $('msg').hidden = true; updateTotals();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+updateTotals();
+
+</script>
+</body>
+</html>
